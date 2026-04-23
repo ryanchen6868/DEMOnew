@@ -22,60 +22,56 @@ body { margin:0; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
 input[type="text"],input[type="date"] { width:100%; padding:14px 16px; border-radius:16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:16px; outline:none; }
 input:focus { border-color:#8b5cf6; background:rgba(255,255,255,0.08); }
 input[type="date"] { color-scheme:dark; }
+input[readonly] { background:rgba(0,0,0,0.2); }
 .toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#10b981; color:#fff; padding:12px 24px; border-radius:999px; font-weight:600; opacity:0; transition:opacity .3s; pointer-events:none; z-index:100; }
 .toast.show { opacity:1; }
-.friend-card { animation:slideIn .5s ease; }
-@keyframes slideIn { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
-@keyframes countUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-.score-pop { animation:countUp .8s cubic-bezier(.34,1.56,.64,1); }
 .radar-poly { fill:rgba(139,92,246,.25); stroke:#c084fc; stroke-width:2; }
-.wx-green { background:#07C160; color:#fff; }
 </style>
 </head>
 <body>
 
 <!-- 首页 -->
-<div id="page-home" class="page" style="display:block">
+<div id="p-home" class="page" style="display:block">
   <div class="flex flex-col justify-center items-center text-center pt-20">
     <div class="text-7xl mb-6">🔮</div>
     <h1 class="text-5xl font-black mb-2"><span class="text-gradient">灵魂匹配</span></h1>
     <h2 class="text-4xl font-black mb-6">实验室</h2>
     <p class="text-white/50 mb-10">命运 · 性格 · 依恋 · 习惯<br><span class="text-sm text-white/30">12题测出你们是真朋友还是塑料情</span></p>
     <div class="w-full max-w-xs space-y-3">
-      <button onclick="goTo('page-login','create')" class="btn-primary">✨ 创建我的测试</button>
-      <button onclick="goTo('page-login','join')" class="btn-secondary">💌 我收到了链接</button>
+      <button onclick="startCreate()" class="btn-primary">✨ 创建我的测试</button>
+      <button onclick="startJoin()" class="btn-secondary">💌 我收到了链接</button>
       <button onclick="loadLibrary()" class="btn-secondary" style="border-color:rgba(7,193,96,0.3);color:#07C160">📚 我的好友库</button>
     </div>
   </div>
 </div>
 
-<!-- 微信风格登录/档案 -->
-<div id="page-login" class="page">
+<!-- 登录/昵称 -->
+<div id="p-login" class="page">
   <div class="pt-16">
-    <button onclick="goTo('page-home')" class="text-white/40 text-sm mb-6">← 返回</button>
+    <button onclick="goHome()" class="text-white/40 text-sm mb-6">← 返回</button>
     <div class="glass p-8 text-center mb-6">
-      <div class="w-16 h-16 rounded-full bg-[#07C160] flex items-center justify-center text-3xl mx-auto mb-4">💬</div>
-      <h2 class="text-2xl font-bold mb-2">微信档案登录</h2>
-      <p class="text-white/40 text-sm mb-6">演示模式：输入昵称生成本地档案<br>数据仅保存在你的浏览器中</p>
-      <input type="text" id="login-name" placeholder="请输入你的微信昵称" class="mb-4">
-      <button onclick="doLogin()" class="btn-primary wx-green">一键生成档案</button>
+      <div class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl mx-auto mb-4">💬</div>
+      <h2 class="text-2xl font-bold mb-2" id="login-title">创建档案</h2>
+      <p class="text-white/40 text-sm mb-6" id="login-sub">输入昵称开始测试<br>数据仅保存在本机</p>
+      <input type="text" id="in-name" placeholder="请输入你的昵称" class="mb-4">
+      <button onclick="doLogin()" class="btn-primary">下一步</button>
     </div>
-    <div id="has-profile" class="hidden glass p-4 text-center cursor-pointer hover:bg-white/10 transition" onclick="useExistingProfile()">
+    <div id="has-profile" class="hidden glass p-4 text-center cursor-pointer hover:bg-white/10 transition" onclick="useProfile()">
       <p class="text-sm text-white/60">检测到已有档案</p>
-      <p class="font-bold text-[#07C160]" id="existing-name"></p>
+      <p class="font-bold text-[#07C160] text-lg" id="existing-name"></p>
       <p class="text-xs text-white/40 mt-1">点击直接使用</p>
     </div>
   </div>
 </div>
 
 <!-- 生日 -->
-<div id="page-birth" class="page">
+<div id="p-birth" class="page">
   <div class="pt-16">
-    <button onclick="goTo('page-login')" class="text-white/40 text-sm mb-6">← 返回</button>
+    <button onclick="goTo('p-login')" class="text-white/40 text-sm mb-6">← 返回</button>
     <h2 class="text-3xl font-bold mb-2">完善档案</h2>
     <p class="text-white/40 mb-8 text-sm">输入出生日期，解锁命运维度</p>
     <div class="space-y-5">
-      <div><label class="block text-sm text-white/60 mb-2">出生日期</label><input type="date" id="input-birth"></div>
+      <div><label class="block text-sm text-white/60 mb-2">出生日期</label><input type="date" id="in-birth"></div>
       <div id="birth-preview" class="hidden glass p-4 grid grid-cols-3 gap-2 text-center">
         <div><div class="text-2xl" id="pre-z-emoji">♈</div><div class="text-xs text-white/40">星座</div><div class="text-sm font-bold" id="pre-z-name">白羊</div></div>
         <div><div class="text-2xl" id="pre-a-emoji">🐭</div><div class="text-xs text-white/40">生肖</div><div class="text-sm font-bold" id="pre-a-name">鼠</div></div>
@@ -87,11 +83,11 @@ input[type="date"] { color-scheme:dark; }
 </div>
 
 <!-- 答题 -->
-<div id="page-quiz" class="page">
+<div id="p-quiz" class="page">
   <div class="pt-8">
     <div class="flex justify-between items-center mb-4">
       <span class="text-xs font-bold text-purple-300" id="quiz-label">性格认知</span>
-      <span class="text-sm text-white/40" id="quiz-counter">1 / 12</span>
+      <span class="text-sm text-white/40" id="quiz-count">1 / 12</span>
     </div>
     <div class="w-full h-1 bg-white/10 rounded-full mb-6"><div id="quiz-bar" class="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all" style="width:0%"></div></div>
     <div class="glass p-6 mb-4">
@@ -101,8 +97,8 @@ input[type="date"] { color-scheme:dark; }
   </div>
 </div>
 
-<!-- 命运预览 -->
-<div id="page-destiny" class="page">
+<!-- 命运页 -->
+<div id="p-destiny" class="page">
   <div class="pt-16 text-center">
     <div class="text-5xl mb-4">✨</div>
     <h2 class="text-2xl font-bold mb-2">命运维度已解锁</h2>
@@ -112,56 +108,59 @@ input[type="date"] { color-scheme:dark; }
       <div><div class="text-3xl mb-1" id="d-a-emoji">🐭</div><div class="text-xs text-white/40">生肖</div><div class="font-bold text-sm" id="d-a-name">鼠</div></div>
       <div><div class="text-3xl mb-1" id="d-s-name">甲</div><div class="text-xs text-white/40">天干</div><div class="font-bold text-sm" id="d-s-full">甲木</div></div>
     </div>
-    <button onclick="goTo('page-wait')" class="btn-primary">生成邀请链接 →</button>
+    <button onclick="goToWait()" class="btn-primary">生成邀请链接 →</button>
   </div>
 </div>
 
-<!-- 等待页 -->
-<div id="page-wait" class="page">
+<!-- 创建者等待页 -->
+<div id="p-wait" class="page">
   <div class="pt-10">
     <div class="text-center mb-6">
-      <div class="w-20 h-20 rounded-full glass flex items-center justify-center text-4xl mx-auto mb-3" id="wait-avatar">👤</div>
+      <div class="w-20 h-20 rounded-full glass flex items-center justify-center text-4xl mx-auto mb-3">👤</div>
       <h2 class="text-2xl font-bold" id="wait-name">我</h2>
-      <p class="text-white/40 text-sm">等待好友挑战...</p>
+      <p class="text-white/40 text-sm" id="wait-info">INTJ · 安全型</p>
     </div>
-    <div class="glass p-5 mb-6">
-      <div class="text-xs text-white/40 mb-2">邀请链接（复制发给好友）</div>
+    
+    <div class="glass p-5 mb-4">
+      <div class="text-xs text-white/40 mb-2 uppercase tracking-wider">1. 邀请好友答题</div>
       <div class="flex gap-2 mb-3">
-        <div class="flex-1 bg-black/20 rounded-lg px-3 py-2 text-sm text-white/70 truncate font-mono" id="share-url"></div>
-        <button onclick="copyLink()" class="bg-white/10 px-4 rounded-lg text-sm font-bold hover:bg-white/20">复制</button>
+        <input readonly id="wait-link" class="flex-1 rounded-lg px-3 py-2 text-sm text-white/70 truncate">
+        <button onclick="copyLink('wait-link')" class="bg-white/10 px-4 rounded-lg text-sm font-bold hover:bg-white/20">复制</button>
       </div>
-      <button onclick="copyLink()" class="w-full wx-green py-2 rounded-lg text-sm font-medium">📋 复制链接发给微信好友</button>
+      <p class="text-xs text-white/30">复制此链接发给微信好友，好友点进去答题</p>
     </div>
-    <div>
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="font-bold text-white/80">实时好友列表</h3>
-        <span class="text-xs text-white/30 bg-white/5 px-2 py-1 rounded-full" id="friend-count">0 人参与</span>
+    
+    <div class="glass p-5 mb-4">
+      <div class="text-xs text-white/40 mb-2 uppercase tracking-wider">2. 好友答完会发回结果链接</div>
+      <div class="flex gap-2">
+        <input type="text" id="paste-link" placeholder="粘贴好友发回的结果链接" class="flex-1 text-sm">
+        <button onclick="openPastedLink()" class="bg-white/10 px-4 rounded-lg text-sm font-bold hover:bg-white/20">查看</button>
       </div>
-      <div id="friend-list" class="space-y-3 pb-20">
-        <div class="text-center text-white/20 text-sm py-8">暂无好友参与<br><span class="text-xs">把链接发给好友，TA完成测试后会自动出现在这里</span></div>
-      </div>
+    </div>
+    
+    <div class="glass p-5 mb-4">
+      <div class="text-xs text-white/40 mb-2 uppercase tracking-wider">3. 我的好友库</div>
+      <button onclick="loadLibrary()" class="btn-secondary" style="border-color:rgba(7,193,96,0.3);color:#07C160">📚 查看已保存的匹配记录</button>
     </div>
   </div>
 </div>
 
 <!-- 结果页 -->
-<div id="page-result" class="page">
+<div id="p-result" class="page">
   <div class="pt-6 pb-12 text-center">
     <div class="flex justify-center items-center gap-4 mb-4">
       <div class="text-center"><div class="w-14 h-14 rounded-full glass flex items-center justify-center text-2xl mx-auto mb-1">👤</div><div class="text-xs font-bold" id="r-name1">我</div></div>
       <div class="text-2xl">💕</div>
       <div class="text-center"><div class="w-14 h-14 rounded-full glass flex items-center justify-center text-2xl mx-auto mb-1">👤</div><div class="text-xs font-bold" id="r-name2">TA</div></div>
     </div>
-    <div class="text-7xl font-black text-gradient score-pop mb-2" id="r-score">0</div>
+    <div class="text-7xl font-black text-gradient mb-2" id="r-score">0</div>
     <div class="text-sm text-white/40 mb-4">默契指数</div>
     <div class="inline-block glass px-4 py-1.5 rounded-full text-sm font-bold text-pink-300 mb-6" id="r-title">计算中...</div>
     
     <div class="glass p-3 mb-4 flex justify-center">
       <svg width="260" height="180" viewBox="0 0 260 180">
-        <g id="radar-grid"></g>
-        <polygon class="radar-poly" id="radar-poly" points=""/>
-        <g id="radar-dots"></g>
-        <g id="radar-labels"></g>
+        <g id="radar-grid"></g><polygon class="radar-poly" id="radar-poly" points=""/>
+        <g id="radar-dots"></g><g id="radar-labels"></g>
       </svg>
     </div>
     
@@ -173,130 +172,148 @@ input[type="date"] { color-scheme:dark; }
     </div>
     
     <div class="glass p-5 mb-6 text-sm text-white/80 leading-relaxed text-left" id="r-desc"></div>
-    <button onclick="location.reload()" class="btn-primary mb-3">我也去测测别人 →</button>
-    <button onclick="saveToLibrary()" class="btn-secondary" style="border-color:rgba(7,193,96,0.3);color:#07C160">💾 保存到好友库</button>
+    
+    <!-- 参与者专属：复制结果链接给创建者 -->
+    <div id="result-share-box" class="hidden glass p-4 mb-4">
+      <div class="text-sm text-white/60 mb-2">把下面链接发给创建者，TA点开就能看到结果</div>
+      <div class="flex gap-2">
+        <input readonly id="result-link" class="flex-1 rounded-lg px-3 py-2 text-sm text-white/70 truncate">
+        <button onclick="copyLink('result-link')" class="bg-green-500/20 text-green-300 px-4 rounded-lg text-sm font-bold">复制</button>
+      </div>
+    </div>
+    
+    <button onclick="saveMatch()" class="btn-primary mb-3">💾 保存到好友库</button>
+    <button onclick="location.reload()" class="btn-secondary">🏠 返回首页</button>
   </div>
 </div>
 
 <!-- 好友库 -->
-<div id="page-library" class="page">
+<div id="p-library" class="page">
   <div class="pt-10">
-    <button onclick="goTo('page-home')" class="text-white/40 text-sm mb-6">← 返回首页</button>
+    <button onclick="goHome()" class="text-white/40 text-sm mb-6">← 返回首页</button>
     <h2 class="text-3xl font-bold mb-2">我的好友库</h2>
     <p class="text-white/40 text-sm mb-6">所有历史匹配记录</p>
-    <div id="lib-profile" class="glass p-4 mb-6 hidden">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xl font-bold" id="lib-avatar">?</div>
-        <div><div class="font-bold" id="lib-myname">未登录</div><div class="text-xs text-white/40" id="lib-myinfo">--</div></div>
-      </div>
-    </div>
     <div id="lib-list" class="space-y-3 pb-20"></div>
   </div>
 </div>
 
-<div id="toast" class="toast">已复制到剪贴板</div>
+<div id="toast" class="toast">已复制</div>
 
 <script>
-// ==================== 核心控制 ====================
-function goTo(id, mode) {
-  document.querySelectorAll('.page').forEach(el => el.style.display = 'none');
-  const target = document.getElementById(id);
-  if(target) target.style.display = 'block';
-  if(mode) APP.mode = mode;
-}
+// ===================== 工具函数 =====================
+function goTo(id){ document.querySelectorAll('.page').forEach(el=>el.style.display='none'); const t=document.getElementById(id); if(t) t.style.display='block'; }
+function goHome(){ location.href = location.origin + location.pathname; }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+function copyLink(inputId){ const el=document.getElementById(inputId); if(!el) return; navigator.clipboard.writeText(el.value).then(()=>showToast('已复制到剪贴板')); }
+function encodeProfile(p){ try{ return btoa(encodeURIComponent(JSON.stringify(p))); }catch(e){ return ''; } }
+function decodeProfile(s){ try{ return JSON.parse(decodeURIComponent(atob(s))); }catch(e){ return null; } }
+function getDB(){ return JSON.parse(localStorage.getItem('soulmatch_v3') || '{"profile":null,"matches":[]}'); }
+function setDB(d){ localStorage.setItem('soulmatch_v3', JSON.stringify(d)); }
 
-// ==================== 数据层 ====================
-const DB = {
-  key: 'soulmatch_v2',
-  get() { return JSON.parse(localStorage.getItem(this.key) || '{"profile":null,"matches":[],"rooms":{}}'); },
-  set(data) { localStorage.setItem(this.key, JSON.stringify(data)); },
-  getRoom(rid) { return this.get().rooms[rid] || null; },
-  setRoom(rid, room) { const d=this.get(); d.rooms[rid]=room; this.set(d); this.broadcast(); },
-  addMatch(m) { const d=this.get(); d.matches.push(m); this.set(d); },
-  broadcast() { if(typeof BroadcastChannel!=='undefined') new BroadcastChannel('sm').postMessage('upd'); }
-};
-if(typeof BroadcastChannel!=='undefined') new BroadcastChannel('sm').onmessage = () => APP.refreshList();
-
-// ==================== 应用状态 ====================
+// ===================== 状态 =====================
 const APP = {
   mode: 'create',
-  roomId: null,
-  user: {name:'',birth:'',zodiac:'',animal:'',stem:'',mbti:'',attach:'',answers:{mbti:[],attach:[],habit:[]}},
+  hostData: null,
+  myData: null,
   curQ: 0,
-  creatorData: null,
-  
-  // 12题题库
-  questions: [
-    // Part2 MBTI (4题)
-    {part:2, q:'当你计划一次旅行时，你最先启动的思维是？', opts:[{t:'复用成功经验，住过的酒店更安心',f:'Si'},{t:'探索未知，期待意外惊喜',f:'Ne'},{t:'享受当下，美食风景必须顶级',f:'Se'},{t:'内心有个画面，要找到契合的感觉',f:'Ni'}]},
-    {part:2, q:'朋友向你哭诉职场不公，你本能反应是？', opts:[{t:'帮TA分析怎么反击最有效',f:'Te'},{t:'判断这事对不对，站哪边',f:'Fi'},{t:'先陪TA哭，情绪共鸣',f:'Fe'},{t:'帮TA理清逻辑漏洞',f:'Ti'}]},
-    {part:2, q:'独处周末，你更可能？', opts:[{t:'整理复盘，规划下周',f:'Si'},{t:'看深度内容，写感悟',f:'Ni'},{t:'找新鲜事，约人出来',f:'Ne'},{t:'拆东西研究原理',f:'Ti'}]},
-    {part:2, q:'如果人生只剩一年，你会？', opts:[{t:'高效完成遗愿清单',f:'Te'},{t:'和重要的人深度连接',f:'Fe'},{t:'按自己节奏体验世界',f:'Fi'},{t:'写书留下思想',f:'Ti'}]},
-    // Part3 依恋 (4题: 2焦虑+2回避)
-    {part:3, dim:'A', q:'伴侣半天不回消息，你会？', opts:[{t:'完全不在意',e:'😌',s:1},{t:'有点不安，但做自己的事',e:'🙂',s:2},{t:'反复看手机，担心出事',e:'😟',s:4},{t:'恐慌，脑补分手或出轨',e:'😰',s:5}]},
-    {part:3, dim:'A', q:'你对"伴侣是否还爱你"的确认需求？', opts:[{t:'不需要确认，我感受得到',e:'😌',s:1},{t:'偶尔需要甜言蜜语',e:'🙂',s:2},{t:'经常需要听到表白',e:'😕',s:4},{t:'每天问，仍怀疑真实性',e:'😰',s:5}]},
-    {part:3, dim:'V', q:'伴侣向你倾诉深层脆弱时，你？', opts:[{t:'全心接纳，一起面对',e:'😌',s:1},{t:'倾听并安慰',e:'🙂',s:2},{t:'不自在，想给建议快速结束',e:'😟',s:4},{t:'极度不适，想逃离',e:'😰',s:5}]},
-    {part:3, dim:'V', q:'对"我需要你"这句话，你？', opts:[{t:'很自然，经常对伴侣说',e:'😌',s:1},{t:'可以说，但有点难',e:'🙂',s:2},{t:'很难说出口',e:'😟',s:4},{t:'绝不说，依赖等于软弱',e:'😰',s:5}]},
-    // Part4 习惯 (4题)
-    {part:4, q:'你的作息类型是？', opts:['严格早睡早起','轻度晨型','轻度夜猫子','彻底昼夜颠倒']},
-    {part:4, q:'发生冲突时，你更倾向？', opts:['必须立即解决','当天解决','冷静几天再说','能避则避']},
-    {part:4, q:'你理想的社交频率是？', opts:['每天都需要见人','每周几次','每月几次深度交流','极少社交']},
-    {part:4, q:'你对居住整洁度的底线是？', opts:['必须一尘不染','大体整洁','功能性乱','越乱越有灵感']}
-  ],
-  
-  init() {
-    const url = new URL(location.href);
-    const room = url.searchParams.get('room');
-    const data = DB.get();
-    // 检查已有档案
-    if(data.profile) {
-      document.getElementById('has-profile').classList.remove('hidden');
-      document.getElementById('existing-name').textContent = data.profile.name;
-    }
-    if(room) {
-      this.mode = 'join';
-      this.roomId = room;
-      this.creatorData = (DB.getRoom(room)||{}).creator;
-      if(this.creatorData) {
-        goTo('page-login','join');
-        document.querySelector('#page-login h2').textContent = '收到默契挑战';
-        document.querySelector('#page-login p').innerHTML = '来自 <b>'+this.creatorData.name+'</b> 的邀请<br>输入你的昵称即可开始';
-      }
-    }
-  },
-  
-  // 生日计算
-  getZodiac(m,d) {
-    const s=[{n:'摩羯座',e:'♑',el:'土',dt:[1,19]},{n:'水瓶座',e:'♒',el:'风',dt:[2,18]},{n:'双鱼座',e:'♓',el:'水',dt:[3,20]},{n:'白羊座',e:'♈',el:'火',dt:[4,19]},{n:'金牛座',e:'♉',el:'土',dt:[5,20]},{n:'双子座',e:'♊',el:'风',dt:[6,21]},{n:'巨蟹座',e:'♋',el:'水',dt:[7,22]},{n:'狮子座',e:'♌',el:'火',dt:[8,22]},{n:'处女座',e:'♍',el:'土',dt:[9,22]},{n:'天秤座',e:'♎',el:'风',dt:[10,23]},{n:'天蝎座',e:'♏',el:'水',dt:[11,21]},{n:'射手座',e:'♐',el:'火',dt:[12,21]},{n:'摩羯座',e:'♑',el:'土',dt:[12,31]}];
-    for(let i=0;i<s.length;i++) if(m===s[i].dt[0]&&d<=s[i].dt[1]) return s[i]; else if(m===s[i].dt[0]-1&&d>(s[i-1]?.dt[1]||0)) return s[i];
-    return s[0];
-  },
-  getAnimal(y){return['猴','鸡','狗','猪','鼠','牛','虎','兔','龙','蛇','马','羊'][y%12]},
-  getStem(y){const st=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'],el=['木','木','火','火','土','土','金','金','水','水']; return{name:st[y%10],full:st[y%10]+el[y%10]}},
+  answers: {mbti:[], attach:[], habit:[]}
 };
 
-// ==================== 登录与档案 ====================
-function doLogin() {
-  const name = document.getElementById('login-name').value.trim();
-  if(!name) { alert('请输入昵称'); return; }
-  APP.user.name = name;
-  goTo('page-birth');
+// ===================== 生日计算 =====================
+function getZodiac(m,d){
+  const s=[{n:'摩羯座',e:'♑',el:'土'},{n:'水瓶座',e:'♒',el:'风'},{n:'双鱼座',e:'♓',el:'水'},{n:'白羊座',e:'♈',el:'火'},{n:'金牛座',e:'♉',el:'土'},{n:'双子座',e:'♊',el:'风'},{n:'巨蟹座',e:'♋',el:'水'},{n:'狮子座',e:'♌',el:'火'},{n:'处女座',e:'♍',el:'土'},{n:'天秤座',e:'♎',el:'风'},{n:'天蝎座',e:'♏',el:'水'},{n:'射手座',e:'♐',el:'火'},{n:'摩羯座',e:'♑',el:'土'}];
+  const days=[19,18,20,19,20,21,22,22,22,23,21,21,31];
+  for(let i=0;i<12;i++) if(m===i+1 && d<=days[i]) return s[i]; else if(m===i+1 && d>days[i]) return s[i+1];
+  return s[0];
 }
-function useExistingProfile() {
-  const p = DB.get().profile;
-  if(!p) return;
-  APP.user = {...APP.user, ...p};
-  if(APP.mode==='create') goTo('page-destiny');
-  else goTo('page-birth');
+function getAnimal(y){ return ['猴','鸡','狗','猪','鼠','牛','虎','兔','龙','蛇','马','羊'][y%12]; }
+function getStem(y){ const st=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'],el=['木','木','火','火','土','土','金','金','水','水']; return {name:st[y%10],full:st[y%10]+el[y%10]}; }
+
+// ===================== 题目库（12题） =====================
+const QS = [
+  // MBTI 4题
+  {part:2, q:'当你计划一次旅行时，你最先启动的思维是？', opts:[{t:'复用成功经验，住过的酒店更安心',f:'Si'},{t:'探索未知，期待意外惊喜',f:'Ne'},{t:'享受当下，美食风景必须顶级',f:'Se'},{t:'内心有个画面，要找到契合的感觉',f:'Ni'}]},
+  {part:2, q:'朋友向你哭诉职场不公，你本能反应是？', opts:[{t:'帮TA分析怎么反击最有效',f:'Te'},{t:'判断这事对不对，站哪边',f:'Fi'},{t:'先陪TA哭，情绪共鸣',f:'Fe'},{t:'帮TA理清逻辑漏洞',f:'Ti'}]},
+  {part:2, q:'独处周末，你更可能？', opts:[{t:'整理复盘，规划下周',f:'Si'},{t:'看深度内容，写感悟',f:'Ni'},{t:'找新鲜事，约人出来',f:'Ne'},{t:'拆东西研究原理',f:'Ti'}]},
+  {part:2, q:'如果人生只剩一年，你会？', opts:[{t:'高效完成遗愿清单',f:'Te'},{t:'和重要的人深度连接',f:'Fe'},{t:'按自己节奏体验世界',f:'Fi'},{t:'写书留下思想',f:'Ti'}]},
+  // 依恋 4题（2焦虑+2回避）
+  {part:3, dim:'A', q:'伴侣半天不回消息，你会？', opts:[{t:'完全不在意',e:'😌',s:1},{t:'有点不安，但做自己的事',e:'🙂',s:2},{t:'反复看手机，担心出事',e:'😟',s:4},{t:'恐慌，脑补分手或出轨',e:'😰',s:5}]},
+  {part:3, dim:'A', q:'你对"伴侣是否还爱你"的确认需求？', opts:[{t:'不需要确认，我感受得到',e:'😌',s:1},{t:'偶尔需要甜言蜜语',e:'🙂',s:2},{t:'经常需要听到表白',e:'😕',s:4},{t:'每天问，仍怀疑真实性',e:'😰',s:5}]},
+  {part:3, dim:'V', q:'伴侣向你倾诉深层脆弱时，你？', opts:[{t:'全心接纳，一起面对',e:'😌',s:1},{t:'倾听并安慰',e:'🙂',s:2},{t:'不自在，想给建议快速结束',e:'😟',s:4},{t:'极度不适，想逃离',e:'😰',s:5}]},
+  {part:3, dim:'V', q:'对"我需要你"这句话，你？', opts:[{t:'很自然，经常对伴侣说',e:'😌',s:1},{t:'可以说，但有点难',e:'🙂',s:2},{t:'很难说出口',e:'😟',s:4},{t:'绝不说，依赖等于软弱',e:'😰',s:5}]},
+  // 习惯 4题
+  {part:4, q:'你的作息类型是？', opts:['严格早睡早起','轻度晨型','轻度夜猫子','彻底昼夜颠倒']},
+  {part:4, q:'发生冲突时，你更倾向？', opts:['必须立即解决','当天解决','冷静几天再说','能避则避']},
+  {part:4, q:'你理想的社交频率是？', opts:['每天都需要见人','每周几次','每月几次深度交流','极少社交']},
+  {part:4, q:'你对居住整洁度的底线是？', opts:['必须一尘不染','大体整洁','功能性乱','越乱越有灵感']}
+];
+
+// ===================== 启动检测 =====================
+function init(){
+  const url = new URL(location.href);
+  const hostB64 = url.searchParams.get('host');
+  const guestB64 = url.searchParams.get('guest');
+  
+  // 模式1: 查看结果 (host + guest)
+  if(hostB64 && guestB64){
+    const host = decodeProfile(hostB64);
+    const guest = decodeProfile(guestB64);
+    if(host && guest){
+      const res = calcMatch(host, guest);
+      showResult(res, host, guest, false, hostB64, guestB64);
+      return;
+    }
+  }
+  
+  // 模式2: 参与者收到邀请 (host only)
+  if(hostB64){
+    const host = decodeProfile(hostB64);
+    if(host){
+      APP.hostData = host;
+      APP.mode = 'join';
+      document.getElementById('login-title').textContent = '收到 ' + host.name + ' 的默契挑战';
+      document.getElementById('login-sub').innerHTML = '输入你的昵称开始答题<br>答完后系统会生成结果链接，你发回给TA即可';
+      goTo('p-login');
+    }
+  }
+  
+  // 检测本地档案
+  const db = getDB();
+  if(db.profile){
+    document.getElementById('has-profile').classList.remove('hidden');
+    document.getElementById('existing-name').textContent = db.profile.name;
+  }
+}
+init();
+
+// ===================== 流程控制 =====================
+function startCreate(){ APP.mode='create'; goTo('p-login'); }
+function startJoin(){
+  const saved = localStorage.getItem('soulmatch_last_link');
+  if(saved && confirm('检测到上次的结果链接，是否查看？')){ location.href = saved; return; }
+  alert('请让好友发送邀请链接给你，点击链接即可进入！');
+}
+function doLogin(){
+  const name = document.getElementById('in-name').value.trim();
+  if(!name){ alert('请输入昵称'); return; }
+  APP.myData = {name};
+  goTo('p-birth');
+}
+function useProfile(){
+  const db = getDB();
+  if(!db.profile) return;
+  APP.myData = db.profile;
+  if(APP.mode==='create') goTo('p-destiny');
+  else goTo('p-quiz');
 }
 
-// ==================== 生日流程 ====================
-document.getElementById('input-birth').addEventListener('change', function() {
+// 生日输入监听
+document.getElementById('in-birth').addEventListener('change', function(){
   if(!this.value) return;
   const d = new Date(this.value);
-  const z = APP.getZodiac(d.getMonth()+1, d.getDate());
-  const a = APP.getAnimal(d.getFullYear());
-  const s = APP.getStem(d.getFullYear());
+  const z = getZodiac(d.getMonth()+1, d.getDate());
+  const a = getAnimal(d.getFullYear());
+  const s = getStem(d.getFullYear());
   document.getElementById('pre-z-emoji').textContent = z.e;
   document.getElementById('pre-z-name').textContent = z.n;
   document.getElementById('pre-a-emoji').textContent = ['🐵','🐔','🐶','🐷','🐭','🐮','🐯','🐰','🐲','🐍','🐴','🐑'][d.getFullYear()%12];
@@ -304,22 +321,23 @@ document.getElementById('input-birth').addEventListener('change', function() {
   document.getElementById('pre-s-name').textContent = s.name;
   document.getElementById('pre-s-full').textContent = s.full;
   document.getElementById('birth-preview').classList.remove('hidden');
-  APP.user.birth = this.value;
-  APP.user.zodiac = z.n; APP.user.animal = a; APP.user.stem = s.name;
+  APP.myData.birth = this.value;
+  APP.myData.zodiac = z.n;
+  APP.myData.animal = a;
+  APP.myData.stem = s.name;
 });
 
-function startQuiz() {
-  if(!APP.user.birth) { alert('请选择出生日期'); return; }
-  APP.curQ = 0;
-  renderQ();
-  goTo('page-quiz');
+function startQuiz(){
+  if(!APP.myData.birth){ alert('请选择出生日期'); return; }
+  APP.curQ = 0; APP.answers = {mbti:[], attach:[], habit:[]};
+  renderQ(); goTo('p-quiz');
 }
 
-// ==================== 答题引擎 ====================
-function renderQ() {
-  const q = APP.questions[APP.curQ];
-  const total = APP.questions.length; // 12
-  document.getElementById('quiz-counter').textContent = (APP.curQ+1)+' / '+total;
+// ===================== 答题引擎 =====================
+function renderQ(){
+  const q = QS[APP.curQ];
+  const total = QS.length;
+  document.getElementById('quiz-count').textContent = (APP.curQ+1)+' / '+total;
   document.getElementById('quiz-bar').style.width = ((APP.curQ)/total*100)+'%';
   document.getElementById('quiz-label').textContent = q.part===2?'性格认知':q.part===3?'恋爱人格':'生活习惯';
   document.getElementById('q-text').textContent = q.q;
@@ -327,8 +345,8 @@ function renderQ() {
   const box = document.getElementById('q-options');
   box.innerHTML = '';
   
-  if(q.part === 3) {
-    // 依恋题：emoji + 文字卡片
+  if(q.part === 3){
+    // 依恋题: emoji + 文字
     q.opts.forEach((opt,i) => {
       const div = document.createElement('div');
       div.className = 'option-card';
@@ -336,7 +354,7 @@ function renderQ() {
       div.onclick = () => selectOpt(i, opt.s, div);
       box.appendChild(div);
     });
-  } else if(q.part === 2) {
+  } else if(q.part === 2){
     // MBTI
     q.opts.forEach((opt,i) => {
       const div = document.createElement('div');
@@ -357,129 +375,107 @@ function renderQ() {
   }
 }
 
-function selectOpt(idx, val, el) {
-  // 视觉反馈
+function selectOpt(idx, val, el){
   const parent = el.parentElement;
   Array.from(parent.children).forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   
-  // 记录
-  const q = APP.questions[APP.curQ];
-  if(q.part===2) APP.user.answers.mbti.push(val);
-  else if(q.part===3) APP.user.answers.attach.push({dim:q.dim, score:val});
-  else APP.user.answers.habit.push(val);
+  const q = QS[APP.curQ];
+  if(q.part===2) APP.answers.mbti.push(val);
+  else if(q.part===3) APP.answers.attach.push(val);
+  else APP.answers.habit.push(val);
   
-  // 下一题
   setTimeout(() => {
     APP.curQ++;
-    if(APP.curQ >= APP.questions.length) finishQuiz();
+    if(APP.curQ >= QS.length) finishQuiz();
     else renderQ();
   }, 350);
 }
 
-// ==================== 完成与计算 ====================
-function finishQuiz() {
+// ===================== 完成计算 =====================
+function finishQuiz(){
   // 计算MBTI
   const sc = {Ni:0,Ne:0,Si:0,Se:0,Ti:0,Te:0,Fi:0,Fe:0};
-  APP.user.answers.mbti.forEach(f => sc[f]++);
+  APP.answers.mbti.forEach(f => sc[f]++);
   const sorted = Object.entries(sc).sort((a,b)=>b[1]-a[1]);
   const dom=sorted[0][0], aux=sorted[1][0];
   const map={'Ni-Te':'INTJ','Te-Ni':'ENTJ','Ni-Fe':'INFJ','Fe-Ni':'ENFJ','Ne-Ti':'ENTP','Ti-Ne':'INTP','Ne-Fi':'ENFP','Fi-Ne':'INFP','Si-Te':'ISTJ','Te-Si':'ESTJ','Si-Fe':'ISFJ','Fe-Si':'ESFJ','Se-Ti':'ISTP','Ti-Se':'ESTP','Se-Fi':'ISFP','Fi-Se':'ESFP'};
-  APP.user.mbti = map[dom+'-'+aux] || 'INTJ';
+  APP.myData.mbti = map[dom+'-'+aux] || 'INTJ';
   
-  // 计算依恋
-  const anx = APP.user.answers.attach.filter(x=>x.dim==='A').reduce((a,b)=>a+b.score,0);
-  const avd = APP.user.answers.attach.filter(x=>x.dim==='V').reduce((a,b)=>a+b.score,0);
+  // 计算依恋 (4题: 前2焦虑 后2回避)
+  const anx = APP.answers.attach[0] + APP.answers.attach[1];
+  const avd = APP.answers.attach[2] + APP.answers.attach[3];
   const anxPct = ((anx-2)/8)*100, avdPct = ((avd-2)/8)*100;
   let at='secure';
   if(anxPct>=60 && avdPct>=60) at='fearful';
   else if(anxPct>=60) at='anxious';
   else if(avdPct>=60) at='avoidant';
-  APP.user.attach = at;
+  APP.myData.attach = at;
+  APP.myData.answers = APP.answers;
   
   // 保存档案
-  const data = DB.get();
-  data.profile = {...APP.user};
-  DB.set(data);
+  const db = getDB();
+  db.profile = {...APP.myData};
+  setDB(db);
   
-  if(APP.mode==='create') {
-    // 创建房间
-    APP.roomId = 'R'+Math.random().toString(36).substr(2,6).toUpperCase();
-    const d = new Date(APP.user.birth);
-    const z = APP.getZodiac(d.getMonth()+1, d.getDate());
-    DB.setRoom(APP.roomId, {
-      creator: {...APP.user, zodiac:z.n, zodiacEmoji:z.e},
-      joiners: {}
-    });
+  if(APP.mode==='create'){
     // 显示命运页
+    const d = new Date(APP.myData.birth);
+    const z = getZodiac(d.getMonth()+1, d.getDate());
     document.getElementById('d-z-emoji').textContent = z.e;
     document.getElementById('d-z-name').textContent = z.n;
     document.getElementById('d-a-emoji').textContent = ['🐵','🐔','🐶','🐷','🐭','🐮','🐯','🐰','🐲','🐍','🐴','🐑'][d.getFullYear()%12];
-    document.getElementById('d-a-name').textContent = APP.user.animal;
-    document.getElementById('d-s-name').textContent = APP.user.stem;
-    document.getElementById('d-s-full').textContent = APP.getStem(d.getFullYear()).full;
-    goTo('page-destiny');
+    document.getElementById('d-a-name').textContent = APP.myData.animal;
+    document.getElementById('d-s-name').textContent = APP.myData.stem;
+    document.getElementById('d-s-full').textContent = getStem(d.getFullYear()).full;
+    goTo('p-destiny');
   } else {
-    // 参与者：提交并显示结果
-    const room = DB.getRoom(APP.roomId);
-    if(!room) { alert('房间不存在'); return; }
-    const jid = 'J'+Math.random().toString(36).substr(2,4);
-    room.joiners[jid] = {...APP.user};
-    DB.setRoom(APP.roomId, room);
-    const res = calcMatch(room.creator, APP.user);
-    showResult(res, room.creator, APP.user, true);
+    // 参与者: 直接计算并显示结果
+    const res = calcMatch(APP.hostData, APP.myData);
+    const hostB64 = encodeProfile(APP.hostData);
+    const guestB64 = encodeProfile(APP.myData);
+    showResult(res, APP.hostData, APP.myData, true, hostB64, guestB64);
   }
 }
 
-// ==================== 等待页 ====================
-function goToWait() {
-  const room = DB.getRoom(APP.roomId);
-  if(!room) return;
-  document.getElementById('wait-name').textContent = room.creator.name;
-  const url = location.origin + location.pathname + '?room=' + APP.roomId;
-  document.getElementById('share-url').textContent = url;
-  goTo('page-wait');
-  APP.refreshList();
-  // 轮询
-  setInterval(() => APP.refreshList(), 1000);
+// ===================== 等待页 =====================
+function goToWait(){
+  const db = getDB();
+  const p = db.profile;
+  if(!p) return;
+  document.getElementById('wait-name').textContent = p.name;
+  document.getElementById('wait-info').textContent = p.mbti + ' · ' + labelAttach(p.attach);
+  
+  // 生成邀请链接 (只包含创建者数据)
+  const hostB64 = encodeProfile(p);
+  const inviteUrl = location.origin + location.pathname + '?host=' + hostB64;
+  document.getElementById('wait-link').value = inviteUrl;
+  
+  goTo('p-wait');
 }
-APP.refreshList = function() {
-  if(!APP.roomId) return;
-  const room = DB.getRoom(APP.roomId);
-  if(!room||!room.joiners) return;
-  const ids = Object.keys(room.joiners);
-  document.getElementById('friend-count').textContent = ids.length+' 人参与';
-  const list = document.getElementById('friend-list');
-  if(ids.length===0) {
-    list.innerHTML = '<div class="text-center text-white/20 text-sm py-8">暂无好友参与<br><span class="text-xs">把链接发给好友，TA完成测试后会自动出现在这里</span></div>';
-    return;
+
+function openPastedLink(){
+  const url = document.getElementById('paste-link').value.trim();
+  if(!url){ alert('请输入链接'); return; }
+  try{
+    const u = new URL(url);
+    const h = u.searchParams.get('host');
+    const g = u.searchParams.get('guest');
+    if(h && g){
+      location.href = location.origin + location.pathname + '?host=' + h + '&guest=' + g;
+    } else {
+      alert('链接格式不正确，需要包含host和guest参数');
+    }
+  }catch(e){
+    alert('请输入有效的URL链接');
   }
-  list.innerHTML = '';
-  ids.forEach(id => {
-    const j = room.joiners[id];
-    const res = calcMatch(room.creator, j);
-    const div = document.createElement('div');
-    div.className = 'friend-card glass p-4 flex items-center gap-3 cursor-pointer hover:bg-white/10 transition';
-    div.innerHTML = '<div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-lg font-bold">'+j.name[0]+'</div><div class="flex-1"><div class="font-bold text-sm">'+j.name+'</div><div class="text-xs text-white/40">'+j.mbti+' · '+labelAttach(j.attach)+'</div></div><div class="text-right"><div class="text-2xl font-black text-gradient">'+res.total+'</div><div class="text-[10px] text-white/30">匹配指数</div></div>';
-    div.onclick = () => showResult(res, room.creator, j, false);
-    list.appendChild(div);
-  });
-};
-
-function copyLink() {
-  const url = document.getElementById('share-url').textContent;
-  navigator.clipboard.writeText(url).then(() => {
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
-  });
 }
 
-// ==================== 匹配算法 ====================
-function calcMatch(c, j) {
+// ===================== 匹配算法 =====================
+function calcMatch(c, j){
   // 命运
   const d1=new Date(c.birth), d2=new Date(j.birth);
-  const z1=APP.getZodiac(d1.getMonth()+1,d1.getDate()), z2=APP.getZodiac(d2.getMonth()+1,d2.getDate());
+  const z1=getZodiac(d1.getMonth()+1,d1.getDate()), z2=getZodiac(d2.getMonth()+1,d2.getDate());
   let zScore=5;
   if(z1.n===z2.n||z1.el===z2.el) zScore=25;
   else if((z1.el==='火'&&z2.el==='风')||(z1.el==='风'&&z2.el==='火')||(z1.el==='水'&&z2.el==='土')||(z1.el==='土'&&z2.el==='水')) zScore=20;
@@ -521,6 +517,9 @@ function calcMatch(c, j) {
     let s=diff===0?10:diff===1?7:diff===2?3:-2;
     habitRaw+=s*w[i]; habitMax+=10*w[i];
   }
+  if(c.answers.habit[1]===j.answers.habit[1] && c.answers.habit[1]===0) habitRaw-=3;
+  if(c.answers.habit[1]===j.answers.habit[1] && c.answers.habit[1]===3) habitRaw-=5;
+  if(Math.abs(c.answers.habit[0]-j.answers.habit[0])<=1) habitRaw+=5;
   const habit=Math.max(0,Math.min(100,(habitRaw/habitMax)*100));
   
   let total=destiny*0.15+mbtiScore*0.35+attachScore*0.30+habit*0.20;
@@ -534,16 +533,24 @@ function getStack(type){
   const s={INTJ:['Ni','Te','Fi','Se'],ENTJ:['Te','Ni','Se','Fi'],INFJ:['Ni','Fe','Ti','Se'],ENFJ:['Fe','Ni','Se','Ti'],INTP:['Ti','Ne','Si','Fe'],ENTP:['Ne','Ti','Fe','Si'],INFP:['Fi','Ne','Si','Te'],ENFP:['Ne','Fi','Te','Si'],ISTJ:['Si','Te','Fi','Ne'],ESTJ:['Te','Si','Ne','Fi'],ISFJ:['Si','Fe','Ti','Ne'],ESFJ:['Fe','Si','Ne','Ti'],ISTP:['Ti','Se','Ni','Fe'],ESTP:['Se','Ti','Fe','Ni'],ISFP:['Fi','Se','Ni','Te'],ESFP:['Se','Fi','Te','Ni']};
   return s[type];
 }
-function labelAttach(t){const m={secure:'安全型',anxious:'焦虑型',avoidant:'回避型',fearful:'恐惧型'};return m[t]||t;}
+function labelAttach(t){ const m={secure:'安全型',anxious:'焦虑型',avoidant:'回避型',fearful:'恐惧型'}; return m[t]||t; }
 
-// ==================== 结果展示 ====================
-function showResult(res, c, j, isJoiner) {
-  goTo('page-result');
-  document.getElementById('r-name1').textContent = isJoiner ? j.name : c.name;
-  document.getElementById('r-name2').textContent = isJoiner ? c.name : j.name;
+// ===================== 结果展示 =====================
+function showResult(res, c, j, isJoinerView, hostB64, guestB64){
+  goTo('p-result');
   
+  // 显示双方名字
+  if(isJoinerView){
+    document.getElementById('r-name1').textContent = j.name; // 参与者(我)
+    document.getElementById('r-name2').textContent = c.name; // 创建者
+  } else {
+    document.getElementById('r-name1').textContent = c.name;
+    document.getElementById('r-name2').textContent = j.name;
+  }
+  
+  // 分数动画
   let cur=0; const el=document.getElementById('r-score');
-  const anim=()=>{cur+=2;if(cur>res.total)cur=res.total;el.textContent=cur;if(cur<res.total)requestAnimationFrame(anim);};
+  const anim=()=>{ cur+=2; if(cur>res.total)cur=res.total; el.textContent=cur; if(cur<res.total)requestAnimationFrame(anim); };
   requestAnimationFrame(anim);
   
   const titles={high:['天选之合','灵魂伴侣','神仙配置'],mid:['默契搭档','潜力股组合','互补型好友'],low:['相爱相杀','深度试炼','缘分奇妙']};
@@ -558,39 +565,36 @@ function showResult(res, c, j, isJoiner) {
   drawRadar([res.destiny,res.mbti,res.attach,res.habit]);
   
   const desc=res.total>=80?'你们在四个维度上均呈现高度协调。命运维度显示文化脚本兼容，性格维度功能栈互补，依恋系统能相互提供安全基地，生活习惯冲突成本极低。这是一段具有长期发展潜力的关系。':
-    res.total>=60?'你们在核心价值与认知层面存在共鸣，但在依恋风格或生活习惯上存在可调和的差异。建议建立"差异管理协议"，例如固定冲突修复时间、明确独处与陪伴的边界。':
-    '当前组合呈现高张力特征。性格或依恋维度存在结构性冲突，需要比常人更高的情绪粒度与刻意经营。建议建立冲突修复仪式，必要时寻求专业支持。';
+    res.total>=60?'你们在核心价值与认知层面存在共鸣，但在依恋风格或生活习惯上存在可调和的差异。建议建立"差异管理协议"。':
+    '当前组合呈现高张力特征。性格或依恋维度存在结构性冲突，需要比常人更高的情绪粒度与刻意经营。';
   document.getElementById('r-desc').textContent=desc;
   
-  // 如果是参与者，自动保存到库
-  if(isJoiner) {
-    DB.addMatch({roomId:APP.roomId, friendName:c.name, friendMbti:c.mbti, friendAttach:c.attach, myRole:'joiner', scores:res, date:new Date().toLocaleString()});
+  // 参与者专属: 显示"复制结果链接给创建者"
+  if(isJoinerView && hostB64 && guestB64){
+    const resultUrl = location.origin + location.pathname + '?host=' + hostB64 + '&guest=' + guestB64;
+    document.getElementById('result-share-box').classList.remove('hidden');
+    document.getElementById('result-link').value = resultUrl;
+    // 自动保存到本地记录
+    localStorage.setItem('soulmatch_last_link', resultUrl);
+  } else {
+    document.getElementById('result-share-box').classList.add('hidden');
   }
-}
-function saveToLibrary() {
-  // 创建者手动保存当前查看的结果
-  const room = DB.getRoom(APP.roomId);
-  if(!room || !room.joiners) return;
-  // 保存所有当前好友
-  Object.values(room.joiners).forEach(j => {
-    const res = calcMatch(room.creator, j);
-    DB.addMatch({roomId:APP.roomId, friendName:j.name, friendMbti:j.mbti, friendAttach:j.attach, myRole:'creator', scores:res, date:new Date().toLocaleString()});
-  });
-  alert('已保存到好友库');
-  loadLibrary();
+  
+  // 保存当前结果到全局，供"保存到好友库"使用
+  APP.lastResult = {res, c, j, date: new Date().toLocaleString()};
 }
 
-function drawRadar(vals) {
+function drawRadar(vals){
   const labels=['命运','性格','依恋','习惯'], colors=['#c084fc','#22d3ee','#f472b6','#fbbf24'];
   const cx=130,cy=90,r=60;
   const ang=i=>(Math.PI*2*i/4)-Math.PI/2;
   let grid='';
   [0.25,0.5,0.75,1].forEach(sc=>{
     let pts='';
-    for(let i=0;i<4;i++){const a=ang(i);pts+=(cx+r*sc*Math.cos(a))+','+(cy+r*sc*Math.sin(a))+' ';}
+    for(let i=0;i<4;i++){ const a=ang(i); pts+=(cx+r*sc*Math.cos(a))+','+(cy+r*sc*Math.sin(a))+' '; }
     grid+='<polygon points="'+pts+'" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>';
   });
-  for(let i=0;i<4;i++){const a=ang(i);grid+='<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+r*Math.cos(a))+'" y2="'+(cy+r*Math.sin(a))+'" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>';}
+  for(let i=0;i<4;i++){ const a=ang(i); grid+='<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+r*Math.cos(a))+'" y2="'+(cy+r*Math.sin(a))+'" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>'; }
   document.getElementById('radar-grid').innerHTML=grid;
   let poly='',dots='',labs='';
   vals.forEach((v,i)=>{
@@ -604,35 +608,46 @@ function drawRadar(vals) {
   document.getElementById('radar-labels').innerHTML=labs;
 }
 
-// ==================== 好友库 ====================
-function loadLibrary() {
-  goTo('page-library');
-  const data = DB.get();
+// ===================== 保存到好友库 =====================
+function saveMatch(){
+  if(!APP.lastResult) return;
+  const {c, j, res, date} = APP.lastResult;
+  const db = getDB();
+  // 避免重复保存
+  const exists = db.matches.some(m => m.friendName === j.name && Math.abs(m.scores.total - res.total) < 2);
+  if(exists){ showToast('该记录已存在'); return; }
+  
+  db.matches.push({
+    friendName: j.name,
+    friendMbti: j.mbti,
+    friendAttach: j.attach,
+    myName: c.name,
+    scores: res,
+    date: date
+  });
+  setDB(db);
+  showToast('已保存到好友库');
+}
+
+// ===================== 好友库 =====================
+function loadLibrary(){
+  goTo('p-library');
+  const db = getDB();
   const list = document.getElementById('lib-list');
   
-  if(data.profile) {
-    document.getElementById('lib-profile').classList.remove('hidden');
-    document.getElementById('lib-avatar').textContent = data.profile.name[0];
-    document.getElementById('lib-myname').textContent = data.profile.name;
-    document.getElementById('lib-myinfo').textContent = data.profile.mbti + ' · ' + labelAttach(data.profile.attach);
-  }
-  
-  if(!data.matches || data.matches.length===0) {
+  if(!db.matches || db.matches.length===0){
     list.innerHTML = '<div class="text-center text-white/20 text-sm py-12">暂无匹配记录<br><span class="text-xs">创建测试并邀请好友后，结果将自动保存在这里</span></div>';
     return;
   }
   
   list.innerHTML = '';
-  data.matches.slice().reverse().forEach((m,i) => {
+  db.matches.slice().reverse().forEach(m => {
     const div = document.createElement('div');
     div.className = 'glass p-4 flex items-center gap-3';
     div.innerHTML = '<div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-lg font-bold">'+m.friendName[0]+'</div><div class="flex-1"><div class="font-bold text-sm">'+m.friendName+'</div><div class="text-xs text-white/40">'+m.friendMbti+' · '+labelAttach(m.friendAttach)+' · '+m.date+'</div></div><div class="text-right"><div class="text-xl font-black text-gradient">'+m.scores.total+'</div></div>';
     list.appendChild(div);
   });
 }
-
-// ==================== 启动 ====================
-window.addEventListener('DOMContentLoaded', () => APP.init());
 </script>
 </body>
 </html>
