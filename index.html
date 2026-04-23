@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" translate="no">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,574 +8,464 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
 * { font-family: 'Noto Sans SC', sans-serif; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-body {
-  background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-  min-height: 100vh; color: white; margin: 0; overflow-x: hidden;
-}
-.glass {
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-}
-.text-gradient {
-  background: linear-gradient(135deg, #c084fc, #f472b6, #22d3ee);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-.btn-primary {
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
-  border: none; color: white; font-weight: 700; cursor: pointer;
-  transition: all 0.3s;
-}
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 40px -10px rgba(139,92,246,0.5); }
-.btn-secondary {
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.8); font-weight: 700; cursor: pointer;
-}
-.btn-secondary:hover { background: rgba(255,255,255,0.1); color: white; }
-.option-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px; padding: 16px; margin-bottom: 10px;
-  cursor: pointer; transition: all 0.2s; color: rgba(255,255,255,0.85);
-}
-.option-card:hover { background: rgba(255,255,255,0.1); border-color: rgba(139,92,246,0.4); transform: translateX(6px); }
-.option-card.selected {
-  background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(236,72,153,0.2));
-  border-color: #c084fc;
-}
-.page { display: none; padding: 20px; max-width: 480px; margin: 0 auto; min-height: 100vh; }
-.page.active { display: block; animation: fadeIn 0.4s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.progress-bar { height: 4px; background: linear-gradient(90deg, #8b5cf6, #ec4899); border-radius: 2px; transition: width 0.4s; }
-input[type="text"], input[type="date"] {
-  width: 100%; padding: 14px 16px; border-radius: 16px;
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15);
-  color: white; font-size: 16px; outline: none;
-}
-input:focus { border-color: #8b5cf6; background: rgba(255,255,255,0.1); }
-input[type="date"] { color-scheme: dark; }
-.toast {
-  position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-  background: #10b981; color: white; padding: 12px 24px; border-radius: 999px;
-  font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100;
-}
-.toast.show { opacity: 1; }
-.friend-card { animation: slideIn 0.5s ease; }
-@keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-.emoji-btn {
-  font-size: 28px; padding: 8px; border-radius: 16px;
-  background: rgba(255,255,255,0.04); border: 2px solid transparent;
-  cursor: pointer; filter: grayscale(0.5); transition: all 0.2s;
-}
-.emoji-btn:hover { transform: scale(1.1); filter: grayscale(0); background: rgba(255,255,255,0.08); }
-.emoji-btn.selected { filter: grayscale(0); border-color: #ec4899; background: rgba(236,72,153,0.15); }
-.radar-poly { fill: rgba(139,92,246,0.25); stroke: #c084fc; stroke-width: 2; }
+body { margin:0; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color:#fff; min-height:100vh; overflow-x:hidden; }
+.glass { background:rgba(255,255,255,0.06); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.1); border-radius:20px; }
+.text-gradient { background:linear-gradient(90deg,#c084fc,#f472b6,#22d3ee); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.btn-primary { background:linear-gradient(135deg,#8b5cf6,#ec4899); border:none; color:#fff; font-weight:700; cursor:pointer; border-radius:16px; padding:14px 24px; font-size:16px; width:100%; transition:all .3s; }
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(139,92,246,.4); }
+.btn-secondary { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.8); font-weight:700; cursor:pointer; border-radius:16px; padding:14px 24px; font-size:16px; width:100%; transition:all .3s; }
+.btn-secondary:hover { background:rgba(255,255,255,0.1); color:#fff; }
+.option-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:16px; margin-bottom:10px; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:12px; }
+.option-card:hover { background:rgba(255,255,255,0.1); border-color:rgba(139,92,246,.4); transform:translateX(6px); }
+.option-card.selected { background:linear-gradient(135deg,rgba(139,92,246,.3),rgba(236,72,153,.2)); border-color:#c084fc; }
+.page { display:none; padding:20px; max-width:480px; margin:0 auto; min-height:100vh; position:relative; }
+input[type="text"],input[type="date"] { width:100%; padding:14px 16px; border-radius:16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:16px; outline:none; }
+input:focus { border-color:#8b5cf6; background:rgba(255,255,255,0.08); }
+input[type="date"] { color-scheme:dark; }
+.toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#10b981; color:#fff; padding:12px 24px; border-radius:999px; font-weight:600; opacity:0; transition:opacity .3s; pointer-events:none; z-index:100; }
+.toast.show { opacity:1; }
+.friend-card { animation:slideIn .5s ease; }
+@keyframes slideIn { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
+@keyframes countUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.score-pop { animation:countUp .8s cubic-bezier(.34,1.56,.64,1); }
+.radar-poly { fill:rgba(139,92,246,.25); stroke:#c084fc; stroke-width:2; }
+.wx-green { background:#07C160; color:#fff; }
 </style>
 </head>
 <body>
 
 <!-- 首页 -->
-<div id="p-home" class="page active flex flex-col justify-center items-center text-center pt-20">
-  <div class="text-7xl mb-6">🔮</div>
-  <h1 class="text-5xl font-black mb-2"><span class="text-gradient">灵魂匹配</span></h1>
-  <h2 class="text-4xl font-black mb-6">实验室</h2>
-  <p class="text-white/50 text-lg mb-2">命运 · 性格 · 依恋 · 习惯</p>
-  <p class="text-white/30 text-sm mb-12">测测你们是真朋友还是塑料情</p>
-  <div class="w-full max-w-xs space-y-4">
-    <button onclick="startCreate()" class="btn-primary w-full py-4 rounded-2xl text-lg">✨ 创建我的测试</button>
-    <button onclick="startJoin()" class="btn-secondary w-full py-4 rounded-2xl text-lg">💌 我收到了链接</button>
+<div id="page-home" class="page" style="display:block">
+  <div class="flex flex-col justify-center items-center text-center pt-20">
+    <div class="text-7xl mb-6">🔮</div>
+    <h1 class="text-5xl font-black mb-2"><span class="text-gradient">灵魂匹配</span></h1>
+    <h2 class="text-4xl font-black mb-6">实验室</h2>
+    <p class="text-white/50 mb-10">命运 · 性格 · 依恋 · 习惯<br><span class="text-sm text-white/30">12题测出你们是真朋友还是塑料情</span></p>
+    <div class="w-full max-w-xs space-y-3">
+      <button onclick="goTo('page-login','create')" class="btn-primary">✨ 创建我的测试</button>
+      <button onclick="goTo('page-login','join')" class="btn-secondary">💌 我收到了链接</button>
+      <button onclick="loadLibrary()" class="btn-secondary" style="border-color:rgba(7,193,96,0.3);color:#07C160">📚 我的好友库</button>
+    </div>
   </div>
 </div>
 
-<!-- 填写信息 -->
-<div id="p-profile" class="page pt-16">
-  <button onclick="showPage('p-home')" class="text-white/40 text-sm mb-6">← 返回</button>
-  <h2 class="text-3xl font-bold mb-2">先认识一下</h2>
-  <p class="text-white/40 mb-8 text-sm" id="profile-subtitle">创建你的灵魂档案</p>
-  <div class="space-y-5">
-    <div>
-      <label class="block text-sm text-white/60 mb-2">你的昵称</label>
-      <input type="text" id="in-name" placeholder="例如：宇宙探索员">
+<!-- 微信风格登录/档案 -->
+<div id="page-login" class="page">
+  <div class="pt-16">
+    <button onclick="goTo('page-home')" class="text-white/40 text-sm mb-6">← 返回</button>
+    <div class="glass p-8 text-center mb-6">
+      <div class="w-16 h-16 rounded-full bg-[#07C160] flex items-center justify-center text-3xl mx-auto mb-4">💬</div>
+      <h2 class="text-2xl font-bold mb-2">微信档案登录</h2>
+      <p class="text-white/40 text-sm mb-6">演示模式：输入昵称生成本地档案<br>数据仅保存在你的浏览器中</p>
+      <input type="text" id="login-name" placeholder="请输入你的微信昵称" class="mb-4">
+      <button onclick="doLogin()" class="btn-primary wx-green">一键生成档案</button>
     </div>
-    <div>
-      <label class="block text-sm text-white/60 mb-2">出生日期</label>
-      <input type="date" id="in-birth">
+    <div id="has-profile" class="hidden glass p-4 text-center cursor-pointer hover:bg-white/10 transition" onclick="useExistingProfile()">
+      <p class="text-sm text-white/60">检测到已有档案</p>
+      <p class="font-bold text-[#07C160]" id="existing-name"></p>
+      <p class="text-xs text-white/40 mt-1">点击直接使用</p>
     </div>
-    <button onclick="startQuiz()" class="btn-primary w-full py-4 rounded-2xl text-lg mt-4">开始灵魂拷问 →</button>
+  </div>
+</div>
+
+<!-- 生日 -->
+<div id="page-birth" class="page">
+  <div class="pt-16">
+    <button onclick="goTo('page-login')" class="text-white/40 text-sm mb-6">← 返回</button>
+    <h2 class="text-3xl font-bold mb-2">完善档案</h2>
+    <p class="text-white/40 mb-8 text-sm">输入出生日期，解锁命运维度</p>
+    <div class="space-y-5">
+      <div><label class="block text-sm text-white/60 mb-2">出生日期</label><input type="date" id="input-birth"></div>
+      <div id="birth-preview" class="hidden glass p-4 grid grid-cols-3 gap-2 text-center">
+        <div><div class="text-2xl" id="pre-z-emoji">♈</div><div class="text-xs text-white/40">星座</div><div class="text-sm font-bold" id="pre-z-name">白羊</div></div>
+        <div><div class="text-2xl" id="pre-a-emoji">🐭</div><div class="text-xs text-white/40">生肖</div><div class="text-sm font-bold" id="pre-a-name">鼠</div></div>
+        <div><div class="text-2xl" id="pre-s-name">甲</div><div class="text-xs text-white/40">天干</div><div class="text-sm font-bold" id="pre-s-full">甲木</div></div>
+      </div>
+      <button onclick="startQuiz()" class="btn-primary">开始答题 →</button>
+    </div>
   </div>
 </div>
 
 <!-- 答题 -->
-<div id="p-quiz" class="page pt-10">
-  <div class="flex justify-between items-center mb-6">
-    <span class="text-xs font-bold text-purple-300 uppercase tracking-wider" id="quiz-part">Part 2</span>
-    <span class="text-sm text-white/40" id="quiz-count">1 / 10</span>
-  </div>
-  <div class="w-full h-1 bg-white/10 rounded-full mb-8">
-    <div id="quiz-progress" class="progress-bar" style="width:0%"></div>
-  </div>
-  <div class="glass p-6 mb-6">
-    <h3 id="q-text" class="text-xl font-bold mb-6 leading-relaxed"></h3>
-    <div id="q-options"></div>
+<div id="page-quiz" class="page">
+  <div class="pt-8">
+    <div class="flex justify-between items-center mb-4">
+      <span class="text-xs font-bold text-purple-300" id="quiz-label">性格认知</span>
+      <span class="text-sm text-white/40" id="quiz-counter">1 / 12</span>
+    </div>
+    <div class="w-full h-1 bg-white/10 rounded-full mb-6"><div id="quiz-bar" class="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all" style="width:0%"></div></div>
+    <div class="glass p-6 mb-4">
+      <h3 id="q-text" class="text-xl font-bold mb-6 leading-relaxed"></h3>
+      <div id="q-options"></div>
+    </div>
   </div>
 </div>
 
 <!-- 命运预览 -->
-<div id="p-destiny" class="page pt-16 text-center">
-  <div class="text-5xl mb-4">✨</div>
-  <h2 class="text-2xl font-bold mb-2">命运维度已解锁</h2>
-  <p class="text-white/40 text-sm mb-8">基于你的出生年月，系统已计算星盘合盘参数</p>
-  <div class="glass p-6 grid grid-cols-3 gap-4 mb-8">
-    <div><div class="text-3xl mb-1" id="d-z-emoji">♈</div><div class="text-xs text-white/40">太阳星座</div><div class="font-bold text-sm" id="d-z-name">白羊座</div></div>
-    <div><div class="text-3xl mb-1" id="d-a-emoji">🐭</div><div class="text-xs text-white/40">生肖</div><div class="font-bold text-sm" id="d-a-name">鼠</div></div>
-    <div><div class="text-3xl mb-1" id="d-s-name">甲</div><div class="text-xs text-white/40">年柱天干</div><div class="font-bold text-sm" id="d-s-full">甲木</div></div>
+<div id="page-destiny" class="page">
+  <div class="pt-16 text-center">
+    <div class="text-5xl mb-4">✨</div>
+    <h2 class="text-2xl font-bold mb-2">命运维度已解锁</h2>
+    <p class="text-white/40 text-sm mb-8">基于你的出生年月计算</p>
+    <div class="glass p-6 grid grid-cols-3 gap-4 mb-8">
+      <div><div class="text-3xl mb-1" id="d-z-emoji">♈</div><div class="text-xs text-white/40">太阳星座</div><div class="font-bold text-sm" id="d-z-name">白羊座</div></div>
+      <div><div class="text-3xl mb-1" id="d-a-emoji">🐭</div><div class="text-xs text-white/40">生肖</div><div class="font-bold text-sm" id="d-a-name">鼠</div></div>
+      <div><div class="text-3xl mb-1" id="d-s-name">甲</div><div class="text-xs text-white/40">天干</div><div class="font-bold text-sm" id="d-s-full">甲木</div></div>
+    </div>
+    <button onclick="goTo('page-wait')" class="btn-primary">生成邀请链接 →</button>
   </div>
-  <button onclick="nextPart()" class="btn-primary w-full py-4 rounded-2xl text-lg">继续：性格测试 →</button>
 </div>
 
 <!-- 等待页 -->
-<div id="p-wait" class="page pt-10">
-  <div class="text-center mb-6">
-    <div class="w-20 h-20 rounded-full glass flex items-center justify-center text-4xl mx-auto mb-3">👤</div>
-    <h2 class="text-2xl font-bold" id="wait-name">我</h2>
-    <p class="text-white/40 text-sm">等待好友挑战...</p>
-  </div>
-  <div class="glass p-5 mb-6">
-    <div class="text-xs text-white/40 mb-2 uppercase">邀请链接</div>
-    <div class="flex gap-2 mb-3">
-      <div class="flex-1 bg-black/20 rounded-lg px-3 py-2 text-sm text-white/70 truncate font-mono" id="share-url"></div>
-      <button onclick="copyLink()" class="bg-white/10 px-4 rounded-lg text-sm font-bold hover:bg-white/20">复制</button>
+<div id="page-wait" class="page">
+  <div class="pt-10">
+    <div class="text-center mb-6">
+      <div class="w-20 h-20 rounded-full glass flex items-center justify-center text-4xl mx-auto mb-3" id="wait-avatar">👤</div>
+      <h2 class="text-2xl font-bold" id="wait-name">我</h2>
+      <p class="text-white/40 text-sm">等待好友挑战...</p>
     </div>
-    <button onclick="copyLink()" class="w-full bg-green-500/20 text-green-300 py-2 rounded-lg text-sm font-medium hover:bg-green-500/30">📋 复制链接发给好友</button>
-  </div>
-  <div>
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="font-bold text-white/80">好友匹配列表</h3>
-      <span class="text-xs text-white/30 bg-white/5 px-2 py-1 rounded-full" id="friend-count">0 人参与</span>
+    <div class="glass p-5 mb-6">
+      <div class="text-xs text-white/40 mb-2">邀请链接（复制发给好友）</div>
+      <div class="flex gap-2 mb-3">
+        <div class="flex-1 bg-black/20 rounded-lg px-3 py-2 text-sm text-white/70 truncate font-mono" id="share-url"></div>
+        <button onclick="copyLink()" class="bg-white/10 px-4 rounded-lg text-sm font-bold hover:bg-white/20">复制</button>
+      </div>
+      <button onclick="copyLink()" class="w-full wx-green py-2 rounded-lg text-sm font-medium">📋 复制链接发给微信好友</button>
     </div>
-    <div id="friend-list" class="space-y-3 pb-20">
-      <div class="text-center text-white/20 text-sm py-8">暂无好友参与<br><span class="text-xs">把链接发给好友，TA完成测试后会自动出现在这里</span></div>
+    <div>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold text-white/80">实时好友列表</h3>
+        <span class="text-xs text-white/30 bg-white/5 px-2 py-1 rounded-full" id="friend-count">0 人参与</span>
+      </div>
+      <div id="friend-list" class="space-y-3 pb-20">
+        <div class="text-center text-white/20 text-sm py-8">暂无好友参与<br><span class="text-xs">把链接发给好友，TA完成测试后会自动出现在这里</span></div>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- 结果页 -->
-<div id="p-result" class="page pt-6 pb-12">
-  <div class="text-center mb-6">
+<div id="page-result" class="page">
+  <div class="pt-6 pb-12 text-center">
     <div class="flex justify-center items-center gap-4 mb-4">
       <div class="text-center"><div class="w-14 h-14 rounded-full glass flex items-center justify-center text-2xl mx-auto mb-1">👤</div><div class="text-xs font-bold" id="r-name1">我</div></div>
       <div class="text-2xl">💕</div>
       <div class="text-center"><div class="w-14 h-14 rounded-full glass flex items-center justify-center text-2xl mx-auto mb-1">👤</div><div class="text-xs font-bold" id="r-name2">TA</div></div>
     </div>
-    <div class="text-7xl font-black text-gradient mb-2" id="r-score">0</div>
+    <div class="text-7xl font-black text-gradient score-pop mb-2" id="r-score">0</div>
     <div class="text-sm text-white/40 mb-4">默契指数</div>
-    <div class="inline-block glass px-4 py-1.5 rounded-full text-sm font-bold text-pink-300" id="r-title">计算中...</div>
+    <div class="inline-block glass px-4 py-1.5 rounded-full text-sm font-bold text-pink-300 mb-6" id="r-title">计算中...</div>
+    
+    <div class="glass p-3 mb-4 flex justify-center">
+      <svg width="260" height="180" viewBox="0 0 260 180">
+        <g id="radar-grid"></g>
+        <polygon class="radar-poly" id="radar-poly" points=""/>
+        <g id="radar-dots"></g>
+        <g id="radar-labels"></g>
+      </svg>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <div class="glass p-3"><div class="text-xs text-white/40 mb-1">✨ 命运缘分</div><div class="text-xl font-bold text-purple-300" id="r-d">--</div></div>
+      <div class="glass p-3"><div class="text-xs text-white/40 mb-1">🧠 性格认知</div><div class="text-xl font-bold text-cyan-300" id="r-m">--</div></div>
+      <div class="glass p-3"><div class="text-xs text-white/40 mb-1">💕 恋爱人格</div><div class="text-xl font-bold text-pink-300" id="r-a">--</div></div>
+      <div class="glass p-3"><div class="text-xs text-white/40 mb-1">☕ 生活习惯</div><div class="text-xl font-bold text-yellow-300" id="r-h">--</div></div>
+    </div>
+    
+    <div class="glass p-5 mb-6 text-sm text-white/80 leading-relaxed text-left" id="r-desc"></div>
+    <button onclick="location.reload()" class="btn-primary mb-3">我也去测测别人 →</button>
+    <button onclick="saveToLibrary()" class="btn-secondary" style="border-color:rgba(7,193,96,0.3);color:#07C160">💾 保存到好友库</button>
   </div>
-  <div class="glass p-3 mb-4 flex justify-center">
-    <svg width="260" height="180" viewBox="0 0 260 180">
-      <g id="radar-grid"></g>
-      <polygon class="radar-poly" id="radar-poly" points=""/>
-      <g id="radar-dots"></g>
-      <g id="radar-labels"></g>
-    </svg>
-  </div>
-  <div class="grid grid-cols-2 gap-3 mb-6">
-    <div class="glass p-3"><div class="text-xs text-white/40 mb-1">✨ 命运缘分</div><div class="text-xl font-bold text-purple-300" id="r-d">--</div></div>
-    <div class="glass p-3"><div class="text-xs text-white/40 mb-1">🧠 性格认知</div><div class="text-xl font-bold text-cyan-300" id="r-m">--</div></div>
-    <div class="glass p-3"><div class="text-xs text-white/40 mb-1">💕 恋爱人格</div><div class="text-xl font-bold text-pink-300" id="r-a">--</div></div>
-    <div class="glass p-3"><div class="text-xs text-white/40 mb-1">☕ 生活习惯</div><div class="text-xl font-bold text-yellow-300" id="r-h">--</div></div>
-  </div>
-  <div class="glass p-5 mb-6 text-sm text-white/80 leading-relaxed" id="r-desc"></div>
-  <button onclick="location.reload()" class="btn-primary w-full py-4 rounded-2xl text-lg">我也去测测别人 →</button>
 </div>
 
-<!-- 详情页 -->
-<div id="p-detail" class="page pt-6 pb-12">
-  <button onclick="showPage('p-wait')" class="text-white/40 text-sm mb-4">← 返回列表</button>
-  <div id="detail-box"></div>
+<!-- 好友库 -->
+<div id="page-library" class="page">
+  <div class="pt-10">
+    <button onclick="goTo('page-home')" class="text-white/40 text-sm mb-6">← 返回首页</button>
+    <h2 class="text-3xl font-bold mb-2">我的好友库</h2>
+    <p class="text-white/40 text-sm mb-6">所有历史匹配记录</p>
+    <div id="lib-profile" class="glass p-4 mb-6 hidden">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xl font-bold" id="lib-avatar">?</div>
+        <div><div class="font-bold" id="lib-myname">未登录</div><div class="text-xs text-white/40" id="lib-myinfo">--</div></div>
+      </div>
+    </div>
+    <div id="lib-list" class="space-y-3 pb-20"></div>
+  </div>
 </div>
 
 <div id="toast" class="toast">已复制到剪贴板</div>
 
 <script>
-// ===================== 状态 =====================
-let MODE = 'creator';
-let ROOM = null;
-let USER = { name:'', birth:'', zodiac:'', animal:'', stem:'', mbti:'', attach:'', attachScore:null, answers:{p2:[],p3:[],p4:[]} };
-let CREATOR_DATA = null;
-let CUR_PART = 1;
-let CUR_Q = 0;
+// ==================== 核心控制 ====================
+function goTo(id, mode) {
+  document.querySelectorAll('.page').forEach(el => el.style.display = 'none');
+  const target = document.getElementById(id);
+  if(target) target.style.display = 'block';
+  if(mode) APP.mode = mode;
+}
 
-// ===================== 题目库 =====================
-const QS = {
-  p2: [
-    {q:"当你计划一次旅行时，你最先启动的思维是？",opts:[{t:"搜索过往经验，复用成功模式",f:"Si"},{t:"想象各种意外联结与可能性",f:"Ne"},{t:"锁定当下最刺激的感官体验",f:"Se"},{t:"内心浮现整体意象，再填充细节",f:"Ni"}]},
-    {q:"朋友向你哭诉职场不公，你第一反应是？",opts:[{t:"分析权力结构，指出反击策略",f:"Te"},{t:"判断是否违背核心价值观",f:"Fi"},{t:"立刻共情，营造拥抱氛围",f:"Fe"},{t:"拆解逻辑漏洞，帮TA看清偏差",f:"Ti"}]},
-    {q:"面对复杂新项目，你更依赖？",opts:[{t:"建立时间表、KPI和问责机制",f:"Te"},{t:"持续头脑风暴，碰撞新方向",f:"Ne"},{t:"信任身体直觉，边做边调整",f:"Se"},{t:"脑中预演完整闭环再行动",f:"Ni"}]},
-    {q:"回忆童年时，你更常想起？",opts:[{t:"具体仪式、食物味道、街道布局",f:"Si"},{t:"一种朦胧的'整体氛围'",f:"Ni"},{t:"当时没做成但至今遗憾的可能",f:"Ne"},{t:"自由奔跑或触摸自然的瞬间",f:"Se"}]},
-    {q:"在亲密关系中，你更难容忍的是？",opts:[{t:"伴侣长期缺乏人生目标",f:"Ni"},{t:"伴侣在公开场合让你难堪",f:"Fe"},{t:"伴侣的逻辑自相矛盾且拒绝反思",f:"Ti"},{t:"伴侣强迫你放弃爱好迎合TA",f:"Fi"}]},
-    {q:"周末独处时，你最可能？",opts:[{t:"整理相册、复盘本周、做meal prep",f:"Si"},{t:"看存在主义电影，写私人感悟",f:"Ni"},{t:"随机参加陌生人聚会",f:"Ne"},{t:"拆解坏电器搞懂原理",f:"Ti"}]},
-    {q:"做重大决定时，你最终依靠？",opts:[{t:"数据、先例和风险收益比",f:"Te"},{t:"是否符合'我想成为的人'",f:"Fi"},{t:"对身边重要他人的影响与责任",f:"Fe"},{t:"概念体系内部是否自洽",f:"Ti"}]},
-    {q:"你对'改变'的态度是？",opts:[{t:"必须服务于明确的绩效提升",f:"Te"},{t:"发现隐藏可能性的唯一途径",f:"Ne"},{t:"让我脱离舒适区，除非被迫否则抗拒",f:"Si"},{t:"内在愿景成熟的自然外化",f:"Ni"}]},
-    {q:"当伴侣说'你根本不懂我'，你认为？",opts:[{t:"我提供的解决方案不够实际",f:"Te"},{t:"我没有准确反映TA的情绪状态",f:"Fe"},{t:"我的价值观表达让TA感到被评判",f:"Fi"},{t:"我的分析框架遗漏了TA的主观逻辑",f:"Ti"}]},
-    {q:"如果人生只剩一年，你会？",opts:[{t:"列出遗愿清单并高效执行",f:"Te"},{t:"深度连接几个重要的人",f:"Fe"},{t:"独自去想去的地方按自己节奏感受",f:"Fi"},{t:"写一本书把毕生思考留给世界",f:"Ti"}]}
+// ==================== 数据层 ====================
+const DB = {
+  key: 'soulmatch_v2',
+  get() { return JSON.parse(localStorage.getItem(this.key) || '{"profile":null,"matches":[],"rooms":{}}'); },
+  set(data) { localStorage.setItem(this.key, JSON.stringify(data)); },
+  getRoom(rid) { return this.get().rooms[rid] || null; },
+  setRoom(rid, room) { const d=this.get(); d.rooms[rid]=room; this.set(d); this.broadcast(); },
+  addMatch(m) { const d=this.get(); d.matches.push(m); this.set(d); },
+  broadcast() { if(typeof BroadcastChannel!=='undefined') new BroadcastChannel('sm').postMessage('upd'); }
+};
+if(typeof BroadcastChannel!=='undefined') new BroadcastChannel('sm').onmessage = () => APP.refreshList();
+
+// ==================== 应用状态 ====================
+const APP = {
+  mode: 'create',
+  roomId: null,
+  user: {name:'',birth:'',zodiac:'',animal:'',stem:'',mbti:'',attach:'',answers:{mbti:[],attach:[],habit:[]}},
+  curQ: 0,
+  creatorData: null,
+  
+  // 12题题库
+  questions: [
+    // Part2 MBTI (4题)
+    {part:2, q:'当你计划一次旅行时，你最先启动的思维是？', opts:[{t:'复用成功经验，住过的酒店更安心',f:'Si'},{t:'探索未知，期待意外惊喜',f:'Ne'},{t:'享受当下，美食风景必须顶级',f:'Se'},{t:'内心有个画面，要找到契合的感觉',f:'Ni'}]},
+    {part:2, q:'朋友向你哭诉职场不公，你本能反应是？', opts:[{t:'帮TA分析怎么反击最有效',f:'Te'},{t:'判断这事对不对，站哪边',f:'Fi'},{t:'先陪TA哭，情绪共鸣',f:'Fe'},{t:'帮TA理清逻辑漏洞',f:'Ti'}]},
+    {part:2, q:'独处周末，你更可能？', opts:[{t:'整理复盘，规划下周',f:'Si'},{t:'看深度内容，写感悟',f:'Ni'},{t:'找新鲜事，约人出来',f:'Ne'},{t:'拆东西研究原理',f:'Ti'}]},
+    {part:2, q:'如果人生只剩一年，你会？', opts:[{t:'高效完成遗愿清单',f:'Te'},{t:'和重要的人深度连接',f:'Fe'},{t:'按自己节奏体验世界',f:'Fi'},{t:'写书留下思想',f:'Ti'}]},
+    // Part3 依恋 (4题: 2焦虑+2回避)
+    {part:3, dim:'A', q:'伴侣半天不回消息，你会？', opts:[{t:'完全不在意',e:'😌',s:1},{t:'有点不安，但做自己的事',e:'🙂',s:2},{t:'反复看手机，担心出事',e:'😟',s:4},{t:'恐慌，脑补分手或出轨',e:'😰',s:5}]},
+    {part:3, dim:'A', q:'你对"伴侣是否还爱你"的确认需求？', opts:[{t:'不需要确认，我感受得到',e:'😌',s:1},{t:'偶尔需要甜言蜜语',e:'🙂',s:2},{t:'经常需要听到表白',e:'😕',s:4},{t:'每天问，仍怀疑真实性',e:'😰',s:5}]},
+    {part:3, dim:'V', q:'伴侣向你倾诉深层脆弱时，你？', opts:[{t:'全心接纳，一起面对',e:'😌',s:1},{t:'倾听并安慰',e:'🙂',s:2},{t:'不自在，想给建议快速结束',e:'😟',s:4},{t:'极度不适，想逃离',e:'😰',s:5}]},
+    {part:3, dim:'V', q:'对"我需要你"这句话，你？', opts:[{t:'很自然，经常对伴侣说',e:'😌',s:1},{t:'可以说，但有点难',e:'🙂',s:2},{t:'很难说出口',e:'😟',s:4},{t:'绝不说，依赖等于软弱',e:'😰',s:5}]},
+    // Part4 习惯 (4题)
+    {part:4, q:'你的作息类型是？', opts:['严格早睡早起','轻度晨型','轻度夜猫子','彻底昼夜颠倒']},
+    {part:4, q:'发生冲突时，你更倾向？', opts:['必须立即解决','当天解决','冷静几天再说','能避则避']},
+    {part:4, q:'你理想的社交频率是？', opts:['每天都需要见人','每周几次','每月几次深度交流','极少社交']},
+    {part:4, q:'你对居住整洁度的底线是？', opts:['必须一尘不染','大体整洁','功能性乱','越乱越有灵感']}
   ],
-  p3: [
-    {q:"当伴侣没有立即回复消息时，你通常会？",dim:"A",opts:[{t:"完全不在意",s:1},{t:"稍感不安",s:2},{t:"反复查看手机",s:3},{t:"感到焦虑",s:4},{t:"恐慌，脑补分手",s:5}]},
-    {q:"在关系中，你有多需要伴侣反复确认'爱你'？",dim:"A",opts:[{t:"从不主动索要",s:1},{t:"偶尔需要",s:2},{t:"希望每周/每月表达",s:3},{t:"需要每天听到",s:4},{t:"即使每天听到仍怀疑",s:5}]},
-    {q:"当伴侣需要独处空间时，你的感受是？",dim:"A",opts:[{t:"松了一口气",s:1},{t:"理解，但会想念",s:2},{t:"有点失落",s:3},{t:"担心关系出了问题",s:4},{t:"极度恐慌",s:5}]},
-    {q:"你是否经常担心伴侣对你的兴趣在减退？",dim:"A",opts:[{t:"从不",s:1},{t:"很少",s:2},{t:"有时",s:3},{t:"经常",s:4},{t:"几乎每天",s:5}]},
-    {q:"吵架后，你更可能？",dim:"A",opts:[{t:"等冷静后再说",s:1},{t:"希望尽快解决",s:2},{t:"立刻追着要结果",s:3},{t:"情绪崩溃",s:4},{t:"威胁分手测试TA",s:5}]},
-    {q:"当伴侣向你倾诉深层情绪时，你的本能是？",dim:"V",opts:[{t:"完全接纳，深入交流",s:1},{t:"倾听并尝试理解",s:2},{t:"有点不自在但仍陪伴",s:3},{t:"急于提供解决方案",s:4},{t:"极度不适，想逃离",s:5}]},
-    {q:"你对'两个人融为一体'这种说法的感觉？",dim:"V",opts:[{t:"浪漫且向往",s:1},{t:"温暖，但保留自我",s:2},{t:"有点肉麻",s:3},{t:"警惕，担心失去独立",s:4},{t:"恐惧，必须保持完全独立",s:5}]},
-    {q:"当关系变得'太亲密'时，你会？",dim:"V",opts:[{t:"享受并推进",s:1},{t:"顺其自然",s:2},{t:"偶尔需要透口气",s:3},{t:"刻意减少联系频率",s:4},{t:"突然冷淡或挑起争端",s:5}]},
-    {q:"向伴侣说'我需要你'对你来说？",dim:"V",opts:[{t:"很自然，经常表达",s:1},{t:"可以开口",s:2},{t:"有点尴尬",s:3},{t:"非常困难",s:4},{t:"绝不可能",s:5}]},
-    {q:"回忆童年与照顾者的关系，你更倾向？",dim:"V",opts:[{t:"温暖可靠，随时可依赖",s:1},{t:"总体稳定",s:2},{t:"记不清或复杂",s:3},{t:"倾向自己解决问题",s:4},{t:"照顾者不可靠，早早学会不依赖",s:5}]}
-  ],
-  p4: [
-    {q:"你的典型作息是？",opts:["严格晨型人，6-7点起","轻度晨型，8点前起","轻度夜型，9-10点起","严格夜型，午后起"]},
-    {q:"你对居住空间整洁度的底线是？",opts:["必须一尘不染","大体整洁","功能性乱","混乱即灵感"]},
-    {q:"面对一笔意外之财（1万元），你会？",opts:["全部存入理财","70%储蓄30%奖励","50%存50%花","全部花掉或旅行"]},
-    {q:"你理想的社交频率是？",opts:["每天都需要互动","每周3-4次","每周1-2次深度交流","每月1-2次"]},
-    {q:"发生冲突时，你更倾向？",opts:["必须立即解决","当天解决","等1-3天","能避则避"]},
-    {q:"你对伴侣'已读不回'的容忍度？",opts:["完全不能忍","半天内不回不安","1-2天可接受","完全无所谓"]},
-    {q:"你的饮食/健康观念是？",opts:["严格计算卡路里","大体健康","想吃就吃","抗拒一切健康规则"]},
-    {q:"面对一个空白周末，你会？",opts:["提前3天排满","有1-2个主事件","当天早上决定","彻底空白"]},
-    {q:"你对'伴侣翻看手机'的态度？",opts:["完全开放","被要求不会拒绝","不舒服","绝对禁区"]},
-    {q:"你更倾向哪种休闲消费？",opts:["购买实体资产","购买课程技能","购买体验","极简消费"]}
-  ]
+  
+  init() {
+    const url = new URL(location.href);
+    const room = url.searchParams.get('room');
+    const data = DB.get();
+    // 检查已有档案
+    if(data.profile) {
+      document.getElementById('has-profile').classList.remove('hidden');
+      document.getElementById('existing-name').textContent = data.profile.name;
+    }
+    if(room) {
+      this.mode = 'join';
+      this.roomId = room;
+      this.creatorData = (DB.getRoom(room)||{}).creator;
+      if(this.creatorData) {
+        goTo('page-login','join');
+        document.querySelector('#page-login h2').textContent = '收到默契挑战';
+        document.querySelector('#page-login p').innerHTML = '来自 <b>'+this.creatorData.name+'</b> 的邀请<br>输入你的昵称即可开始';
+      }
+    }
+  },
+  
+  // 生日计算
+  getZodiac(m,d) {
+    const s=[{n:'摩羯座',e:'♑',el:'土',dt:[1,19]},{n:'水瓶座',e:'♒',el:'风',dt:[2,18]},{n:'双鱼座',e:'♓',el:'水',dt:[3,20]},{n:'白羊座',e:'♈',el:'火',dt:[4,19]},{n:'金牛座',e:'♉',el:'土',dt:[5,20]},{n:'双子座',e:'♊',el:'风',dt:[6,21]},{n:'巨蟹座',e:'♋',el:'水',dt:[7,22]},{n:'狮子座',e:'♌',el:'火',dt:[8,22]},{n:'处女座',e:'♍',el:'土',dt:[9,22]},{n:'天秤座',e:'♎',el:'风',dt:[10,23]},{n:'天蝎座',e:'♏',el:'水',dt:[11,21]},{n:'射手座',e:'♐',el:'火',dt:[12,21]},{n:'摩羯座',e:'♑',el:'土',dt:[12,31]}];
+    for(let i=0;i<s.length;i++) if(m===s[i].dt[0]&&d<=s[i].dt[1]) return s[i]; else if(m===s[i].dt[0]-1&&d>(s[i-1]?.dt[1]||0)) return s[i];
+    return s[0];
+  },
+  getAnimal(y){return['猴','鸡','狗','猪','鼠','牛','虎','兔','龙','蛇','马','羊'][y%12]},
+  getStem(y){const st=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'],el=['木','木','火','火','土','土','金','金','水','水']; return{name:st[y%10],full:st[y%10]+el[y%10]}},
 };
 
-// ===================== 页面切换 =====================
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+// ==================== 登录与档案 ====================
+function doLogin() {
+  const name = document.getElementById('login-name').value.trim();
+  if(!name) { alert('请输入昵称'); return; }
+  APP.user.name = name;
+  goTo('page-birth');
+}
+function useExistingProfile() {
+  const p = DB.get().profile;
+  if(!p) return;
+  APP.user = {...APP.user, ...p};
+  if(APP.mode==='create') goTo('page-destiny');
+  else goTo('page-birth');
 }
 
-// ===================== 流程入口 =====================
-function startCreate() {
-  MODE = 'creator';
-  document.getElementById('profile-subtitle').textContent = '创建你的灵魂档案';
-  showPage('p-profile');
-}
-function startJoin() {
-  const url = new URL(location.href);
-  const room = url.searchParams.get('room');
-  if (!room) {
-    const saved = localStorage.getItem('soulmatch_last_room');
-    if (saved && confirm('检测到上次访问的房间 ' + saved + '，是否进入？')) {
-      location.search = '?room=' + saved;
-      return;
-    }
-    alert('请让好友发送邀请链接给你，点击链接即可进入！');
-    return;
-  }
-  MODE = 'joiner';
-  ROOM = room;
-  document.getElementById('profile-subtitle').textContent = '有人想测测和你的默契度';
-  // 加载创建者信息
-  const data = getMockRoom(ROOM);
-  if (data && data.creator) {
-    CREATOR_DATA = data.creator;
-  }
-  showPage('p-profile');
-}
+// ==================== 生日流程 ====================
+document.getElementById('input-birth').addEventListener('change', function() {
+  if(!this.value) return;
+  const d = new Date(this.value);
+  const z = APP.getZodiac(d.getMonth()+1, d.getDate());
+  const a = APP.getAnimal(d.getFullYear());
+  const s = APP.getStem(d.getFullYear());
+  document.getElementById('pre-z-emoji').textContent = z.e;
+  document.getElementById('pre-z-name').textContent = z.n;
+  document.getElementById('pre-a-emoji').textContent = ['🐵','🐔','🐶','🐷','🐭','🐮','🐯','🐰','🐲','🐍','🐴','🐑'][d.getFullYear()%12];
+  document.getElementById('pre-a-name').textContent = a;
+  document.getElementById('pre-s-name').textContent = s.name;
+  document.getElementById('pre-s-full').textContent = s.full;
+  document.getElementById('birth-preview').classList.remove('hidden');
+  APP.user.birth = this.value;
+  APP.user.zodiac = z.n; APP.user.animal = a; APP.user.stem = s.name;
+});
 
-// ===================== 生日计算 =====================
-function getZodiac(m, d) {
-  const signs = [
-    {n:'摩羯座',e:'♑',el:'土',po:'阴',dt:[1,19]},{n:'水瓶座',e:'♒',el:'风',po:'阳',dt:[2,18]},
-    {n:'双鱼座',e:'♓',el:'水',po:'阴',dt:[3,20]},{n:'白羊座',e:'♈',el:'火',po:'阳',dt:[4,19]},
-    {n:'金牛座',e:'♉',el:'土',po:'阴',dt:[5,20]},{n:'双子座',e:'♊',el:'风',po:'阳',dt:[6,21]},
-    {n:'巨蟹座',e:'♋',el:'水',po:'阴',dt:[7,22]},{n:'狮子座',e:'♌',el:'火',po:'阳',dt:[8,22]},
-    {n:'处女座',e:'♍',el:'土',po:'阴',dt:[9,22]},{n:'天秤座',e:'♎',el:'风',po:'阳',dt:[10,23]},
-    {n:'天蝎座',e:'♏',el:'水',po:'阴',dt:[11,21]},{n:'射手座',e:'♐',el:'火',po:'阳',dt:[12,21]},
-    {n:'摩羯座',e:'♑',el:'土',po:'阴',dt:[12,31]}
-  ];
-  for (let s of signs) {
-    if (m === s.dt[0] && d <= s.dt[1]) return s;
-    if (m === s.dt[0]-1 && d > (signs[signs.indexOf(s)-1]?.dt[1]||0)) return s;
-  }
-  return signs[0];
-}
-function getAnimal(y) { return ['猴','鸡','狗','猪','鼠','牛','虎','兔','龙','蛇','马','羊'][y%12]; }
-function getStem(y) {
-  const stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-  const elems = ['木','木','火','火','土','土','金','金','水','水'];
-  return {name:stems[y%10],elem:elems[y%10],full:stems[y%10]+elems[y%10]};
-}
-
-// ===================== 答题流程 =====================
 function startQuiz() {
-  const name = document.getElementById('in-name').value.trim();
-  const birth = document.getElementById('in-birth').value;
-  if (!name || !birth) { alert('请填写完整信息'); return; }
-  USER.name = name; USER.birth = birth;
-  const d = new Date(birth);
-  const z = getZodiac(d.getMonth()+1, d.getDate());
-  const a = getAnimal(d.getFullYear());
-  const s = getStem(d.getFullYear());
-  USER.zodiac = z.n; USER.animal = a; USER.stem = s.name;
-  
-  if (MODE === 'creator') {
-    document.getElementById('d-z-emoji').textContent = z.e;
-    document.getElementById('d-z-name').textContent = z.n;
-    document.getElementById('d-a-emoji').textContent = ['🐵','🐔','🐶','🐷','🐭','🐮','🐯','🐰','🐲','🐍','🐴','🐑'][d.getFullYear()%12];
-    document.getElementById('d-a-name').textContent = a;
-    document.getElementById('d-s-name').textContent = s.name;
-    document.getElementById('d-s-full').textContent = s.full;
-    showPage('p-destiny');
-  } else {
-    CUR_PART = 2; CUR_Q = 0;
-    renderQ();
-    showPage('p-quiz');
-  }
-}
-function nextPart() {
-  CUR_PART = 2; CUR_Q = 0;
+  if(!APP.user.birth) { alert('请选择出生日期'); return; }
+  APP.curQ = 0;
   renderQ();
-  showPage('p-quiz');
+  goTo('page-quiz');
 }
 
+// ==================== 答题引擎 ====================
 function renderQ() {
-  const part = CUR_PART;
-  const idx = CUR_Q;
-  let q, isEmoji = false, isNum = false;
-  
-  if (part === 2) {
-    q = QS.p2[idx];
-    document.getElementById('quiz-part').textContent = 'Part 2 · 性格认知';
-    document.getElementById('quiz-count').textContent = (idx+1) + ' / ' + QS.p2.length;
-  } else if (part === 3) {
-    q = QS.p3[idx];
-    document.getElementById('quiz-part').textContent = 'Part 3 · 恋爱人格';
-    document.getElementById('quiz-count').textContent = (idx+1) + ' / ' + QS.p3.length;
-    isEmoji = true;
-  } else {
-    q = QS.p4[idx];
-    document.getElementById('quiz-part').textContent = 'Part 4 · 生活习惯';
-    document.getElementById('quiz-count').textContent = (idx+1) + ' / ' + QS.p4.length;
-    isNum = true;
-  }
-  
-  const totalQ = 30;
-  const curTotal = (part-2)*10 + idx;
-  document.getElementById('quiz-progress').style.width = (curTotal/totalQ*100) + '%';
+  const q = APP.questions[APP.curQ];
+  const total = APP.questions.length; // 12
+  document.getElementById('quiz-counter').textContent = (APP.curQ+1)+' / '+total;
+  document.getElementById('quiz-bar').style.width = ((APP.curQ)/total*100)+'%';
+  document.getElementById('quiz-label').textContent = q.part===2?'性格认知':q.part===3?'恋爱人格':'生活习惯';
   document.getElementById('q-text').textContent = q.q;
   
   const box = document.getElementById('q-options');
   box.innerHTML = '';
   
-  if (isEmoji) {
-    const emojis = ['😌','🙂','😕','😟','😰'];
-    const labels = ['完全不会','偶尔','有时','经常','总是'];
-    const row = document.createElement('div');
-    row.className = 'flex justify-between gap-2';
-    q.opts.forEach((opt, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'emoji-btn flex-1 flex flex-col items-center gap-1';
-      btn.innerHTML = '<span>'+emojis[i]+'</span><span style="font-size:10px;color:rgba(255,255,255,0.4)">'+labels[i]+'</span>';
-      btn.onclick = function() {
-        document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
-        this.classList.add('selected');
-        setTimeout(() => selectOpt(i, opt.s), 300);
-      };
-      row.appendChild(btn);
-    });
-    box.appendChild(row);
-  } else if (isNum) {
-    q.opts.forEach((opt, i) => {
+  if(q.part === 3) {
+    // 依恋题：emoji + 文字卡片
+    q.opts.forEach((opt,i) => {
       const div = document.createElement('div');
       div.className = 'option-card';
-      div.textContent = opt;
-      div.onclick = function() {
-        document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
-        this.classList.add('selected');
-        setTimeout(() => selectOpt(i, i), 300);
-      };
+      div.innerHTML = '<div class="text-3xl">'+opt.e+'</div><div class="flex-1"><div class="font-bold text-sm">'+opt.t+'</div></div>';
+      div.onclick = () => selectOpt(i, opt.s, div);
+      box.appendChild(div);
+    });
+  } else if(q.part === 2) {
+    // MBTI
+    q.opts.forEach((opt,i) => {
+      const div = document.createElement('div');
+      div.className = 'option-card';
+      div.innerHTML = '<div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-bold">'+(i+1)+'</div><div class="flex-1 font-medium text-sm">'+opt.t+'</div>';
+      div.onclick = () => selectOpt(i, opt.f, div);
       box.appendChild(div);
     });
   } else {
-    q.opts.forEach((opt, i) => {
+    // 习惯
+    q.opts.forEach((opt,i) => {
       const div = document.createElement('div');
       div.className = 'option-card';
-      div.textContent = opt.t;
-      div.onclick = function() {
-        document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
-        this.classList.add('selected');
-        setTimeout(() => selectOpt(i, opt.f), 300);
-      };
+      div.innerHTML = '<div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-bold">'+(i+1)+'</div><div class="flex-1 font-medium text-sm">'+opt+'</div>';
+      div.onclick = () => selectOpt(i, i, div);
       box.appendChild(div);
     });
   }
 }
 
-function selectOpt(idx, val) {
-  if (CUR_PART === 2) USER.answers.p2.push(val);
-  else if (CUR_PART === 3) USER.answers.p3.push(val);
-  else USER.answers.p4.push(val);
+function selectOpt(idx, val, el) {
+  // 视觉反馈
+  const parent = el.parentElement;
+  Array.from(parent.children).forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
   
-  CUR_Q++;
-  const maxQ = CUR_PART === 2 ? QS.p2.length : (CUR_PART === 3 ? QS.p3.length : QS.p4.length);
-  if (CUR_Q >= maxQ) {
-    if (CUR_PART < 4) { CUR_PART++; CUR_Q = 0; }
-    else { finishQuiz(); return; }
-  }
-  renderQ();
+  // 记录
+  const q = APP.questions[APP.curQ];
+  if(q.part===2) APP.user.answers.mbti.push(val);
+  else if(q.part===3) APP.user.answers.attach.push({dim:q.dim, score:val});
+  else APP.user.answers.habit.push(val);
+  
+  // 下一题
+  setTimeout(() => {
+    APP.curQ++;
+    if(APP.curQ >= APP.questions.length) finishQuiz();
+    else renderQ();
+  }, 350);
 }
 
-// ===================== 计算逻辑 =====================
-function calcMBTI(ans) {
-  const sc = {Ni:0,Ne:0,Si:0,Se:0,Ti:0,Te:0,Fi:0,Fe:0};
-  ans.forEach(f => sc[f]++);
-  const sorted = Object.entries(sc).sort((a,b) => b[1]-a[1]);
-  const dom = sorted[0][0], aux = sorted[1][0];
-  const map = {'Ni-Te':'INTJ','Te-Ni':'ENTJ','Ni-Fe':'INFJ','Fe-Ni':'ENFJ','Ne-Ti':'ENTP','Ti-Ne':'INTP','Ne-Fi':'ENFP','Fi-Ne':'INFP','Si-Te':'ISTJ','Te-Si':'ESTJ','Si-Fe':'ISFJ','Fe-Si':'ESFJ','Se-Ti':'ISTP','Ti-Se':'ESTP','Se-Fi':'ISFP','Fi-Se':'ESFP'};
-  return map[dom+'-'+aux] || 'INTJ';
-}
-function calcAttach(ans) {
-  const anx = ans.slice(0,5).reduce((a,b) => a+b, 0);
-  const avd = ans.slice(5,10).reduce((a,b) => a+b, 0);
-  const nA = (anx/25)*100, nV = (avd/25)*100;
-  let t = 'secure';
-  if (nA >= 60 && nV >= 60) t = 'fearful';
-  else if (nA >= 60) t = 'anxious';
-  else if (nV >= 60) t = 'avoidant';
-  return {type:t, anxiety:nA, avoidance:nV};
-}
-function getStack(type) {
-  const s = {INTJ:['Ni','Te','Fi','Se'],ENTJ:['Te','Ni','Se','Fi'],INFJ:['Ni','Fe','Ti','Se'],ENFJ:['Fe','Ni','Se','Ti'],INTP:['Ti','Ne','Si','Fe'],ENTP:['Ne','Ti','Fe','Si'],INFP:['Fi','Ne','Si','Te'],ENFP:['Ne','Fi','Te','Si'],ISTJ:['Si','Te','Fi','Ne'],ESTJ:['Te','Si','Ne','Fi'],ISFJ:['Si','Fe','Ti','Ne'],ESFJ:['Fe','Si','Ne','Ti'],ISTP:['Ti','Se','Ni','Fe'],ESTP:['Se','Ti','Fe','Ni'],ISFP:['Fi','Se','Ni','Te'],ESFP:['Se','Fi','Te','Ni']};
-  return s[type];
-}
-
-function calcMatch(c, j) {
-  // 命运
-  const d1 = new Date(c.birth), d2 = new Date(j.birth);
-  const z1 = getZodiac(d1.getMonth()+1, d1.getDate()), z2 = getZodiac(d2.getMonth()+1, d2.getDate());
-  let zScore = 5;
-  if (z1.n === z2.n || z1.el === z2.el) zScore = 25;
-  else if ((z1.el==='火'&&z2.el==='风')||(z1.el==='风'&&z2.el==='火')||(z1.el==='水'&&z2.el==='土')||(z1.el==='土'&&z2.el==='水')) zScore = 20;
-  else if (z1.po === z2.po) zScore = 10;
-  const opps = [['白羊座','天秤座'],['金牛座','天蝎座'],['双子座','射手座'],['巨蟹座','摩羯座'],['狮子座','水瓶座'],['处女座','双鱼座']];
-  if (opps.some(([a,b]) => (z1.n===a&&z2.n===b)||(z1.n===b&&z2.n===a))) zScore = 15;
-  
-  const a1 = d1.getFullYear()%12, a2 = d2.getFullYear()%12;
-  const s1 = d1.getFullYear()%10, s2 = d2.getFullYear()%10;
-  let cScore = 0;
-  const lh = [[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
-  if (lh.some(([x,y]) => (a1===x&&a2===y)||(a1===y&&a2===x))) cScore = 20;
-  const sh = [[0,4,8],[1,5,9],[2,6,10],[3,7,11]];
-  if (sh.some(g => g.includes(a1)&&g.includes(a2)&&a1!==a2)) cScore = 15;
-  if (Math.abs(s1-s2)===1) cScore = Math.max(cScore, 10);
-  const ch = [[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]];
-  if (ch.some(([x,y]) => (a1===x&&a2===y)||(a1===y&&a2===x))) cScore = -10;
-  const destiny = Math.max(0, Math.min(100, (zScore*0.6 + cScore*0.4)*4));
-  
-  // MBTI
-  let mbti = 55;
-  const st1 = getStack(c.mbti), st2 = getStack(j.mbti);
-  if (st1 && st2) {
-    if (st1[0]===st2[3] && st1[1]===st2[2] && st1[2]===st2[1] && st1[3]===st2[0]) mbti = 95;
-    else if ([...new Set(st1)].filter(x => new Set(st2).has(x)).length >= 2) mbti = 80;
-    else if (st1[0]===st2[1] && st1[1]===st2[0]) mbti = 75;
-    else if ({'Ne':'Si','Si':'Ne','Se':'Ni','Ni':'Se','Te':'Fi','Fi':'Te','Fe':'Ti','Ti':'Fe'}[st1[0]] === st2[0]) mbti = 70;
-    else if (c.mbti === j.mbti) mbti = 60;
-    else if ([['Te','Fi'],['Fi','Te'],['Fe','Ti'],['Ti','Fe']].some(([a,b]) => st1[0]===a&&st2[0]===b)) mbti = 40;
-  }
-  
-  // 依恋
-  const mat = {'secure-secure':100,'secure-anxious':75,'secure-avoidant':65,'secure-fearful':60,'anxious-anxious':45,'avoidant-avoidant':40,'anxious-avoidant':30,'fearful-fearful':35,'anxious-fearful':40,'avoidant-fearful':45};
-  const k1 = c.attach+'-'+j.attach, k2 = j.attach+'-'+c.attach;
-  let attach = mat[k1] || mat[k2] || 50;
-  
-  // 习惯
-  const w = [1.5,1.5,1.3,1.0,1.5,1.0,1.0,1.3,1.0,1.0];
-  let habit = 0, max = 0;
-  for (let i=0;i<10;i++) {
-    const d = Math.abs(c.answers.p4[i] - j.answers.p4[i]);
-    let sc = d===0?10:d===1?7:d===2?3:-2;
-    habit += sc*w[i]; max += 10*w[i];
-  }
-  if (c.answers.p4[4]===j.answers.p4[4] && c.answers.p4[4]===0) habit -= 3;
-  if (c.answers.p4[4]===j.answers.p4[4] && c.answers.p4[4]===3) habit -= 5;
-  if (Math.abs(c.answers.p4[0]-j.answers.p4[0]) <= 1) habit += 5;
-  habit = Math.max(0, Math.min(100, (habit/max)*100));
-  
-  let total = destiny*0.15 + mbti*0.35 + attach*0.30 + habit*0.20;
-  if ((c.attach==='anxious'&&j.attach==='avoidant')||(c.attach==='avoidant'&&j.attach==='anxious')) total -= 18;
-  if (c.attach==='fearful'&&j.attach==='fearful') total -= 15;
-  if (st1 && st2 && [['Te','Fi'],['Fi','Te'],['Fe','Ti'],['Ti','Fe']].some(([a,b]) => st1[0]===a&&st2[0]===b)) total -= 12;
-  
-  return {destiny, mbti, attach, habit, total: Math.max(20, Math.min(100, Math.round(total)))};
-}
-
-// ===================== MockDB（演示模式） =====================
-function getMockData() {
-  return JSON.parse(localStorage.getItem('soulmatch_data') || '{}');
-}
-function setMockData(data) {
-  localStorage.setItem('soulmatch_data', JSON.stringify(data));
-}
-function getMockRoom(rid) {
-  return getMockData()[rid] || null;
-}
-function setMockRoom(rid, roomData) {
-  const d = getMockData();
-  d[rid] = roomData;
-  setMockData(d);
-  // 广播
-  if (typeof BroadcastChannel !== 'undefined') {
-    const ch = new BroadcastChannel('soulmatch');
-    ch.postMessage({type:'update'});
-  }
-}
-// 轮询监听
-let lastData = '';
-setInterval(() => {
-  const cur = localStorage.getItem('soulmatch_data');
-  if (cur !== lastData) {
-    lastData = cur;
-    if (MODE === 'creator' && ROOM) refreshFriendList();
-  }
-}, 500);
-
-// ===================== 完成答题 =====================
+// ==================== 完成与计算 ====================
 function finishQuiz() {
-  USER.mbti = calcMBTI(USER.answers.p2);
-  const att = calcAttach(USER.answers.p3);
-  USER.attach = att.type;
-  USER.attachScore = att;
+  // 计算MBTI
+  const sc = {Ni:0,Ne:0,Si:0,Se:0,Ti:0,Te:0,Fi:0,Fe:0};
+  APP.user.answers.mbti.forEach(f => sc[f]++);
+  const sorted = Object.entries(sc).sort((a,b)=>b[1]-a[1]);
+  const dom=sorted[0][0], aux=sorted[1][0];
+  const map={'Ni-Te':'INTJ','Te-Ni':'ENTJ','Ni-Fe':'INFJ','Fe-Ni':'ENFJ','Ne-Ti':'ENTP','Ti-Ne':'INTP','Ne-Fi':'ENFP','Fi-Ne':'INFP','Si-Te':'ISTJ','Te-Si':'ESTJ','Si-Fe':'ISFJ','Fe-Si':'ESFJ','Se-Ti':'ISTP','Ti-Se':'ESTP','Se-Fi':'ISFP','Fi-Se':'ESFP'};
+  APP.user.mbti = map[dom+'-'+aux] || 'INTJ';
   
-  if (MODE === 'creator') {
-    ROOM = 'R' + Math.random().toString(36).substr(2,6).toUpperCase();
-    setMockRoom(ROOM, {
-      creator: {name:USER.name, birth:USER.birth, zodiac:USER.zodiac, animal:USER.animal, stem:USER.stem, mbti:USER.mbti, attach:USER.attach, attachScore:USER.attachScore, answers:USER.answers},
+  // 计算依恋
+  const anx = APP.user.answers.attach.filter(x=>x.dim==='A').reduce((a,b)=>a+b.score,0);
+  const avd = APP.user.answers.attach.filter(x=>x.dim==='V').reduce((a,b)=>a+b.score,0);
+  const anxPct = ((anx-2)/8)*100, avdPct = ((avd-2)/8)*100;
+  let at='secure';
+  if(anxPct>=60 && avdPct>=60) at='fearful';
+  else if(anxPct>=60) at='anxious';
+  else if(avdPct>=60) at='avoidant';
+  APP.user.attach = at;
+  
+  // 保存档案
+  const data = DB.get();
+  data.profile = {...APP.user};
+  DB.set(data);
+  
+  if(APP.mode==='create') {
+    // 创建房间
+    APP.roomId = 'R'+Math.random().toString(36).substr(2,6).toUpperCase();
+    const d = new Date(APP.user.birth);
+    const z = APP.getZodiac(d.getMonth()+1, d.getDate());
+    DB.setRoom(APP.roomId, {
+      creator: {...APP.user, zodiac:z.n, zodiacEmoji:z.e},
       joiners: {}
     });
-    localStorage.setItem('soulmatch_last_room', ROOM);
-    showWaiting();
+    // 显示命运页
+    document.getElementById('d-z-emoji').textContent = z.e;
+    document.getElementById('d-z-name').textContent = z.n;
+    document.getElementById('d-a-emoji').textContent = ['🐵','🐔','🐶','🐷','🐭','🐮','🐯','🐰','🐲','🐍','🐴','🐑'][d.getFullYear()%12];
+    document.getElementById('d-a-name').textContent = APP.user.animal;
+    document.getElementById('d-s-name').textContent = APP.user.stem;
+    document.getElementById('d-s-full').textContent = APP.getStem(d.getFullYear()).full;
+    goTo('page-destiny');
   } else {
-    const jid = 'J' + Math.random().toString(36).substr(2,4);
-    const room = getMockRoom(ROOM);
-    if (!room) { alert('房间不存在或已过期'); return; }
-    room.joiners[jid] = {name:USER.name, birth:USER.birth, zodiac:USER.zodiac, animal:USER.animal, stem:USER.stem, mbti:USER.mbti, attach:USER.attach, attachScore:USER.attachScore, answers:USER.answers};
-    setMockRoom(ROOM, room);
-    
-    const result = calcMatch(room.creator, room.joiners[jid]);
-    showResult(result, room.creator, room.joiners[jid]);
+    // 参与者：提交并显示结果
+    const room = DB.getRoom(APP.roomId);
+    if(!room) { alert('房间不存在'); return; }
+    const jid = 'J'+Math.random().toString(36).substr(2,4);
+    room.joiners[jid] = {...APP.user};
+    DB.setRoom(APP.roomId, room);
+    const res = calcMatch(room.creator, APP.user);
+    showResult(res, room.creator, APP.user, true);
   }
 }
 
-// ===================== 等待页 =====================
-function showWaiting() {
-  document.getElementById('wait-name').textContent = USER.name;
-  const url = location.origin + location.pathname + '?room=' + ROOM;
+// ==================== 等待页 ====================
+function goToWait() {
+  const room = DB.getRoom(APP.roomId);
+  if(!room) return;
+  document.getElementById('wait-name').textContent = room.creator.name;
+  const url = location.origin + location.pathname + '?room=' + APP.roomId;
   document.getElementById('share-url').textContent = url;
-  showPage('p-wait');
-  refreshFriendList();
+  goTo('page-wait');
+  APP.refreshList();
+  // 轮询
+  setInterval(() => APP.refreshList(), 1000);
 }
+APP.refreshList = function() {
+  if(!APP.roomId) return;
+  const room = DB.getRoom(APP.roomId);
+  if(!room||!room.joiners) return;
+  const ids = Object.keys(room.joiners);
+  document.getElementById('friend-count').textContent = ids.length+' 人参与';
+  const list = document.getElementById('friend-list');
+  if(ids.length===0) {
+    list.innerHTML = '<div class="text-center text-white/20 text-sm py-8">暂无好友参与<br><span class="text-xs">把链接发给好友，TA完成测试后会自动出现在这里</span></div>';
+    return;
+  }
+  list.innerHTML = '';
+  ids.forEach(id => {
+    const j = room.joiners[id];
+    const res = calcMatch(room.creator, j);
+    const div = document.createElement('div');
+    div.className = 'friend-card glass p-4 flex items-center gap-3 cursor-pointer hover:bg-white/10 transition';
+    div.innerHTML = '<div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-lg font-bold">'+j.name[0]+'</div><div class="flex-1"><div class="font-bold text-sm">'+j.name+'</div><div class="text-xs text-white/40">'+j.mbti+' · '+labelAttach(j.attach)+'</div></div><div class="text-right"><div class="text-2xl font-black text-gradient">'+res.total+'</div><div class="text-[10px] text-white/30">匹配指数</div></div>';
+    div.onclick = () => showResult(res, room.creator, j, false);
+    list.appendChild(div);
+  });
+};
+
 function copyLink() {
   const url = document.getElementById('share-url').textContent;
   navigator.clipboard.writeText(url).then(() => {
@@ -584,108 +474,165 @@ function copyLink() {
     setTimeout(() => t.classList.remove('show'), 2000);
   });
 }
-function refreshFriendList() {
-  if (!ROOM) return;
-  const room = getMockRoom(ROOM);
-  if (!room || !room.joiners) return;
-  const ids = Object.keys(room.joiners);
-  document.getElementById('friend-count').textContent = ids.length + ' 人参与';
-  const list = document.getElementById('friend-list');
-  if (ids.length === 0) {
-    list.innerHTML = '<div class="text-center text-white/20 text-sm py-8">暂无好友参与<br><span class="text-xs">把链接发给好友，TA完成测试后会自动出现在这里</span></div>';
-    return;
-  }
-  list.innerHTML = '';
-  ids.forEach(id => {
-    const j = room.joiners[id];
-    const result = calcMatch(room.creator, j);
-    const div = document.createElement('div');
-    div.className = 'friend-card glass p-4 flex items-center gap-3 cursor-pointer hover:bg-white/10 transition';
-    div.innerHTML = '<div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-lg font-bold">'+j.name[0]+'</div><div class="flex-1"><div class="font-bold text-sm">'+j.name+'</div><div class="text-xs text-white/40">'+j.mbti+' · '+getAttachLabel(j.attach)+'</div></div><div class="text-right"><div class="text-2xl font-black text-gradient">'+result.total+'</div><div class="text-[10px] text-white/30">匹配指数</div></div>';
-    div.onclick = () => showDetail(j, result);
-    list.appendChild(div);
-  });
-}
-function getAttachLabel(t) {
-  const m = {secure:'安全型',anxious:'焦虑型',avoidant:'回避型',fearful:'恐惧型'};
-  return m[t] || t;
-}
 
-// ===================== 结果展示 =====================
-function showResult(result, c, j) {
-  document.getElementById('r-name1').textContent = j.name;
-  document.getElementById('r-name2').textContent = c.name;
-  let cur = 0;
-  const el = document.getElementById('r-score');
-  const anim = () => { cur += 2; if (cur > result.total) cur = result.total; el.textContent = cur; if (cur < result.total) requestAnimationFrame(anim); };
+// ==================== 匹配算法 ====================
+function calcMatch(c, j) {
+  // 命运
+  const d1=new Date(c.birth), d2=new Date(j.birth);
+  const z1=APP.getZodiac(d1.getMonth()+1,d1.getDate()), z2=APP.getZodiac(d2.getMonth()+1,d2.getDate());
+  let zScore=5;
+  if(z1.n===z2.n||z1.el===z2.el) zScore=25;
+  else if((z1.el==='火'&&z2.el==='风')||(z1.el==='风'&&z2.el==='火')||(z1.el==='水'&&z2.el==='土')||(z1.el==='土'&&z2.el==='水')) zScore=20;
+  const opps=[['白羊座','天秤座'],['金牛座','天蝎座'],['双子座','射手座'],['巨蟹座','摩羯座'],['狮子座','水瓶座'],['处女座','双鱼座']];
+  if(opps.some(([a,b])=>(z1.n===a&&z2.n===b)||(z1.n===b&&z2.n===a))) zScore=15;
+  const a1=d1.getFullYear()%12,a2=d2.getFullYear()%12;
+  let cScore=0;
+  const lh=[[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
+  if(lh.some(([x,y])=>(a1===x&&a2===y)||(a1===y&&a2===x))) cScore=20;
+  const sh=[[0,4,8],[1,5,9],[2,6,10],[3,7,11]];
+  if(sh.some(g=>g.includes(a1)&&g.includes(a2)&&a1!==a2)) cScore=15;
+  const s1=d1.getFullYear()%10,s2=d2.getFullYear()%10;
+  if(Math.abs(s1-s2)===1) cScore=Math.max(cScore,10);
+  const ch=[[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]];
+  if(ch.some(([x,y])=>(a1===x&&a2===y)||(a1===y&&a2===x))) cScore=-10;
+  const destiny=Math.max(0,Math.min(100,(zScore*0.6+cScore*0.4)*4));
+  
+  // MBTI
+  let mbtiScore=55;
+  const st1=getStack(c.mbti),st2=getStack(j.mbti);
+  if(st1&&st2){
+    if(st1[0]===st2[3]&&st1[1]===st2[2]&&st1[2]===st2[1]&&st1[3]===st2[0]) mbtiScore=95;
+    else if([...new Set(st1)].filter(x=>new Set(st2).has(x)).length>=2) mbtiScore=80;
+    else if(st1[0]===st2[1]&&st1[1]===st2[0]) mbtiScore=75;
+    else if({'Ne':'Si','Si':'Ne','Se':'Ni','Ni':'Se','Te':'Fi','Fi':'Te','Fe':'Ti','Ti':'Fe'}[st1[0]]===st2[0]) mbtiScore=70;
+    else if(c.mbti===j.mbti) mbtiScore=60;
+    else if([['Te','Fi'],['Fi','Te'],['Fe','Ti'],['Ti','Fe']].some(([a,b])=>st1[0]===a&&st2[0]===b)) mbtiScore=40;
+  }
+  
+  // 依恋
+  const mat={'secure-secure':100,'secure-anxious':75,'secure-avoidant':65,'secure-fearful':60,'anxious-anxious':45,'avoidant-avoidant':40,'anxious-avoidant':30,'fearful-fearful':35,'anxious-fearful':40,'avoidant-fearful':45};
+  let attachScore=mat[c.attach+'-'+j.attach]||mat[j.attach+'-'+c.attach]||50;
+  
+  // 习惯 (4题)
+  let habitRaw=0, habitMax=0;
+  const w=[1.5,1.5,1.0,1.0];
+  for(let i=0;i<4;i++){
+    const diff=Math.abs(c.answers.habit[i]-j.answers.habit[i]);
+    let s=diff===0?10:diff===1?7:diff===2?3:-2;
+    habitRaw+=s*w[i]; habitMax+=10*w[i];
+  }
+  const habit=Math.max(0,Math.min(100,(habitRaw/habitMax)*100));
+  
+  let total=destiny*0.15+mbtiScore*0.35+attachScore*0.30+habit*0.20;
+  if((c.attach==='anxious'&&j.attach==='avoidant')||(c.attach==='avoidant'&&j.attach==='anxious')) total-=18;
+  if(c.attach==='fearful'&&j.attach==='fearful') total-=15;
+  if(st1&&st2&&[['Te','Fi'],['Fi','Te'],['Fe','Ti'],['Ti','Fe']].some(([a,b])=>st1[0]===a&&st2[0]===b)) total-=12;
+  
+  return {destiny, mbti:mbtiScore, attach:attachScore, habit, total:Math.max(20,Math.min(100,Math.round(total)))};
+}
+function getStack(type){
+  const s={INTJ:['Ni','Te','Fi','Se'],ENTJ:['Te','Ni','Se','Fi'],INFJ:['Ni','Fe','Ti','Se'],ENFJ:['Fe','Ni','Se','Ti'],INTP:['Ti','Ne','Si','Fe'],ENTP:['Ne','Ti','Fe','Si'],INFP:['Fi','Ne','Si','Te'],ENFP:['Ne','Fi','Te','Si'],ISTJ:['Si','Te','Fi','Ne'],ESTJ:['Te','Si','Ne','Fi'],ISFJ:['Si','Fe','Ti','Ne'],ESFJ:['Fe','Si','Ne','Ti'],ISTP:['Ti','Se','Ni','Fe'],ESTP:['Se','Ti','Fe','Ni'],ISFP:['Fi','Se','Ni','Te'],ESFP:['Se','Fi','Te','Ni']};
+  return s[type];
+}
+function labelAttach(t){const m={secure:'安全型',anxious:'焦虑型',avoidant:'回避型',fearful:'恐惧型'};return m[t]||t;}
+
+// ==================== 结果展示 ====================
+function showResult(res, c, j, isJoiner) {
+  goTo('page-result');
+  document.getElementById('r-name1').textContent = isJoiner ? j.name : c.name;
+  document.getElementById('r-name2').textContent = isJoiner ? c.name : j.name;
+  
+  let cur=0; const el=document.getElementById('r-score');
+  const anim=()=>{cur+=2;if(cur>res.total)cur=res.total;el.textContent=cur;if(cur<res.total)requestAnimationFrame(anim);};
   requestAnimationFrame(anim);
   
-  const titles = {high:['天选之合','灵魂伴侣','神仙配置'],mid:['默契搭档','潜力股组合','互补型好友'],low:['相爱相杀','深度试炼','缘分奇妙']};
-  let pool = result.total >= 80 ? titles.high : result.total >= 60 ? titles.mid : titles.low;
-  document.getElementById('r-title').textContent = pool[result.total % pool.length];
+  const titles={high:['天选之合','灵魂伴侣','神仙配置'],mid:['默契搭档','潜力股组合','互补型好友'],low:['相爱相杀','深度试炼','缘分奇妙']};
+  let pool=res.total>=80?titles.high:res.total>=60?titles.mid:titles.low;
+  document.getElementById('r-title').textContent=pool[res.total%pool.length];
   
-  document.getElementById('r-d').textContent = Math.round(result.destiny);
-  document.getElementById('r-m').textContent = Math.round(result.mbti);
-  document.getElementById('r-a').textContent = Math.round(result.attach);
-  document.getElementById('r-h').textContent = Math.round(result.habit);
+  document.getElementById('r-d').textContent=Math.round(res.destiny);
+  document.getElementById('r-m').textContent=Math.round(res.mbti);
+  document.getElementById('r-a').textContent=Math.round(res.attach);
+  document.getElementById('r-h').textContent=Math.round(res.habit);
   
-  drawRadar([result.destiny, result.mbti, result.attach, result.habit]);
+  drawRadar([res.destiny,res.mbti,res.attach,res.habit]);
   
-  const desc = result.total >= 80 ? '你们的组合在四个维度上均呈现高度协调。命运维度显示文化脚本兼容，性格维度功能栈互补，依恋系统能相互提供安全基地，生活习惯冲突成本极低。' :
-    result.total >= 60 ? '你们在核心价值与认知层面存在共鸣，但在依恋风格或生活习惯上存在可调和的差异。建议建立"差异管理协议"。' :
-    '当前组合呈现高张力特征。性格或依恋维度存在结构性冲突，需要比常人更高的情绪粒度与专业支持来建立安全的关系容器。';
-  document.getElementById('r-desc').textContent = desc;
+  const desc=res.total>=80?'你们在四个维度上均呈现高度协调。命运维度显示文化脚本兼容，性格维度功能栈互补，依恋系统能相互提供安全基地，生活习惯冲突成本极低。这是一段具有长期发展潜力的关系。':
+    res.total>=60?'你们在核心价值与认知层面存在共鸣，但在依恋风格或生活习惯上存在可调和的差异。建议建立"差异管理协议"，例如固定冲突修复时间、明确独处与陪伴的边界。':
+    '当前组合呈现高张力特征。性格或依恋维度存在结构性冲突，需要比常人更高的情绪粒度与刻意经营。建议建立冲突修复仪式，必要时寻求专业支持。';
+  document.getElementById('r-desc').textContent=desc;
   
-  showPage('p-result');
+  // 如果是参与者，自动保存到库
+  if(isJoiner) {
+    DB.addMatch({roomId:APP.roomId, friendName:c.name, friendMbti:c.mbti, friendAttach:c.attach, myRole:'joiner', scores:res, date:new Date().toLocaleString()});
+  }
+}
+function saveToLibrary() {
+  // 创建者手动保存当前查看的结果
+  const room = DB.getRoom(APP.roomId);
+  if(!room || !room.joiners) return;
+  // 保存所有当前好友
+  Object.values(room.joiners).forEach(j => {
+    const res = calcMatch(room.creator, j);
+    DB.addMatch({roomId:APP.roomId, friendName:j.name, friendMbti:j.mbti, friendAttach:j.attach, myRole:'creator', scores:res, date:new Date().toLocaleString()});
+  });
+  alert('已保存到好友库');
+  loadLibrary();
 }
 
 function drawRadar(vals) {
-  const labels = ['命运','性格','依恋','习惯'];
-  const colors = ['#c084fc','#22d3ee','#f472b6','#fbbf24'];
-  const cx = 130, cy = 90, r = 60;
-  const ang = i => (Math.PI*2*i/4) - Math.PI/2;
-  let grid = '';
-  [0.25,0.5,0.75,1].forEach(sc => {
-    let pts = '';
-    for (let i=0;i<4;i++) { const a=ang(i); pts += (cx+r*sc*Math.cos(a))+','+(cy+r*sc*Math.sin(a))+' '; }
-    grid += '<polygon points="'+pts+'" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>';
+  const labels=['命运','性格','依恋','习惯'], colors=['#c084fc','#22d3ee','#f472b6','#fbbf24'];
+  const cx=130,cy=90,r=60;
+  const ang=i=>(Math.PI*2*i/4)-Math.PI/2;
+  let grid='';
+  [0.25,0.5,0.75,1].forEach(sc=>{
+    let pts='';
+    for(let i=0;i<4;i++){const a=ang(i);pts+=(cx+r*sc*Math.cos(a))+','+(cy+r*sc*Math.sin(a))+' ';}
+    grid+='<polygon points="'+pts+'" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>';
   });
-  for (let i=0;i<4;i++) { const a=ang(i); grid += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+r*Math.cos(a))+'" y2="'+(cy+r*Math.sin(a))+'" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>'; }
-  document.getElementById('radar-grid').innerHTML = grid;
+  for(let i=0;i<4;i++){const a=ang(i);grid+='<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+r*Math.cos(a))+'" y2="'+(cy+r*Math.sin(a))+'" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>';}
+  document.getElementById('radar-grid').innerHTML=grid;
+  let poly='',dots='',labs='';
+  vals.forEach((v,i)=>{
+    const a=ang(i),dist=(v/100)*r,x=cx+dist*Math.cos(a),y=cy+dist*Math.sin(a);
+    poly+=x+','+y+' '; dots+='<circle cx="'+x+'" cy="'+y+'" r="4" fill="#ec4899"/>';
+    const lx=cx+(r+22)*Math.cos(a),ly=cy+(r+22)*Math.sin(a);
+    labs+='<text x="'+lx+'" y="'+ly+'" text-anchor="middle" dominant-baseline="middle" fill="'+colors[i]+'" font-size="12" font-weight="bold">'+labels[i]+'</text>';
+  });
+  document.getElementById('radar-poly').setAttribute('points',poly);
+  document.getElementById('radar-dots').innerHTML=dots;
+  document.getElementById('radar-labels').innerHTML=labs;
+}
+
+// ==================== 好友库 ====================
+function loadLibrary() {
+  goTo('page-library');
+  const data = DB.get();
+  const list = document.getElementById('lib-list');
   
-  let poly = '', dots = '', labs = '';
-  vals.forEach((v,i) => {
-    const a = ang(i), dist = (v/100)*r, x = cx+dist*Math.cos(a), y = cy+dist*Math.sin(a);
-    poly += x+','+y+' ';
-    dots += '<circle cx="'+x+'" cy="'+y+'" r="4" fill="#ec4899"/>';
-    const lx = cx+(r+22)*Math.cos(a), ly = cy+(r+22)*Math.sin(a);
-    labs += '<text x="'+lx+'" y="'+ly+'" text-anchor="middle" dominant-baseline="middle" fill="'+colors[i]+'" font-size="12" font-weight="bold">'+labels[i]+'</text>';
-  });
-  document.getElementById('radar-poly').setAttribute('points', poly);
-  document.getElementById('radar-dots').innerHTML = dots;
-  document.getElementById('radar-labels').innerHTML = labs;
-}
-
-function showDetail(j, result) {
-  const c = (MODE === 'creator' && getMockRoom(ROOM)) ? getMockRoom(ROOM).creator : USER;
-  const html = '<div class="text-center mb-6"><div class="flex justify-center items-center gap-3 mb-4"><div class="text-center"><div class="w-14 h-14 rounded-full glass flex items-center justify-center text-2xl mx-auto mb-1">'+c.name[0]+'</div><div class="text-xs font-bold">'+c.name+'</div></div><div class="text-2xl">💕</div><div class="text-center"><div class="w-14 h-14 rounded-full glass flex items-center justify-center text-2xl mx-auto mb-1">'+j.name[0]+'</div><div class="text-xs font-bold">'+j.name+'</div></div></div><div class="text-6xl font-black text-gradient mb-2">'+result.total+'</div><div class="text-sm text-white/40">详细匹配报告</div></div><div class="space-y-3 mb-6"><div class="glass p-3 flex justify-between"><span class="text-sm text-white/60">✨ 命运缘分</span><span class="font-bold text-purple-300">'+Math.round(result.destiny)+'分</span></div><div class="glass p-3 flex justify-between"><span class="text-sm text-white/60">🧠 性格认知 ('+c.mbti+' vs '+j.mbti+')</span><span class="font-bold text-cyan-300">'+Math.round(result.mbti)+'分</span></div><div class="glass p-3 flex justify-between"><span class="text-sm text-white/60">💕 恋爱人格 ('+getAttachLabel(c.attach)+' vs '+getAttachLabel(j.attach)+')</span><span class="font-bold text-pink-300">'+Math.round(result.attach)+'分</span></div><div class="glass p-3 flex justify-between"><span class="text-sm text-white/60">☕ 生活习惯</span><span class="font-bold text-yellow-300">'+Math.round(result.habit)+'分</span></div></div><div class="glass p-4 text-sm text-white/70 leading-relaxed">'+ (result.total >= 80 ? '这是一段具有长期发展潜力的关系，四个维度协调度都很高。' : result.total >= 60 ? '你们有共鸣也有差异，这正是共同进化的空间。' : '当前组合需要极高的情绪粒度与刻意经营，建议建立冲突修复仪式。') +'</div>';
-  document.getElementById('detail-box').innerHTML = html;
-  showPage('p-detail');
-}
-
-// ===================== 启动 =====================
-document.addEventListener('DOMContentLoaded', () => {
-  const url = new URL(location.href);
-  const room = url.searchParams.get('room');
-  if (room) {
-    MODE = 'joiner';
-    ROOM = room;
-    const data = getMockRoom(room);
-    if (data && data.creator) CREATOR_DATA = data.creator;
-    document.getElementById('profile-subtitle').textContent = '有人想测测和你的默契度';
-    showPage('p-profile');
+  if(data.profile) {
+    document.getElementById('lib-profile').classList.remove('hidden');
+    document.getElementById('lib-avatar').textContent = data.profile.name[0];
+    document.getElementById('lib-myname').textContent = data.profile.name;
+    document.getElementById('lib-myinfo').textContent = data.profile.mbti + ' · ' + labelAttach(data.profile.attach);
   }
-});
+  
+  if(!data.matches || data.matches.length===0) {
+    list.innerHTML = '<div class="text-center text-white/20 text-sm py-12">暂无匹配记录<br><span class="text-xs">创建测试并邀请好友后，结果将自动保存在这里</span></div>';
+    return;
+  }
+  
+  list.innerHTML = '';
+  data.matches.slice().reverse().forEach((m,i) => {
+    const div = document.createElement('div');
+    div.className = 'glass p-4 flex items-center gap-3';
+    div.innerHTML = '<div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-lg font-bold">'+m.friendName[0]+'</div><div class="flex-1"><div class="font-bold text-sm">'+m.friendName+'</div><div class="text-xs text-white/40">'+m.friendMbti+' · '+labelAttach(m.friendAttach)+' · '+m.date+'</div></div><div class="text-right"><div class="text-xl font-black text-gradient">'+m.scores.total+'</div></div>';
+    list.appendChild(div);
+  });
+}
+
+// ==================== 启动 ====================
+window.addEventListener('DOMContentLoaded', () => APP.init());
 </script>
 </body>
 </html>
