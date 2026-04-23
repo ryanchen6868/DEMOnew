@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>灵魂匹配实验室 | Soul Match Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --accent: #ec4899;
+            --cyan: #06b6d4;
+            --dark: #0f0c29;
+        }
+        * { font-family: 'Inter', 'Noto Sans SC', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: white;
+        }
+        
+        /* 动态背景 */
+        .bg-orb {
+            position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.4; z-index: 0; pointer-events: none;
+            animation: float 20s infinite ease-in-out;
+        }
+        .orb-1 { width: 400px; height: 400px; background: #8b5cf6; top: -10%; left: -10%; animation-delay: 0s; }
+        .orb-2 { width: 300px; height: 300px; background: #ec4899; bottom: 10%; right: -5%; animation-delay: -5s; }
+        .orb-3 { width: 250px; height: 250px; background: #06b6d4; top: 40%; left: 60%; animation-delay: -10s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        
+        /* 玻璃拟态 */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        /* 渐变文字 */
+        .text-gradient {
+            background: linear-gradient(135deg, #c084fc 0%, #f472b6 50%, #22d3ee 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* 按钮光效 */
+        .btn-glow {
+            position: relative; overflow: hidden;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            transition: all 0.3s ease;
+        }
+        .btn-glow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px -10px rgba(139, 92, 246, 0.6);
+        }
+        .btn-glow::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+        }
+        .btn-glow:hover::after { left: 100%; }
+        
+        /* 选项卡片 */
+        .option-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .option-card:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(139, 92, 246, 0.5);
+            transform: translateX(8px);
+        }
+        .option-card.selected {
+            background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.2));
+            border-color: #c084fc;
+            box-shadow: 0 0 20px rgba(139,92,246,0.2);
+        }
+        
+        /* 进度条 */
+        .progress-glow {
+            background: linear-gradient(90deg, #8b5cf6, #ec4899, #06b6d4);
+            box-shadow: 0 0 10px rgba(139,92,246,0.5);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 页面切换动画 */
+        .page { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease; }
+        .page.active { display: block; opacity: 1; transform: translateY(0); }
+        
+        /* 分数滚动 */
+        @keyframes countUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .score-pop { animation: countUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        
+        /* 好友卡片滑入 */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .friend-card { animation: slideIn 0.5s ease forwards; }
+        
+        /* 雷达图 */
+        .radar-poly {
+            fill: rgba(139, 92, 246, 0.2);
+            stroke: #c084fc;
+            stroke-width: 2;
+            filter: drop-shadow(0 0 8px rgba(139,92,246,0.4));
+        }
+        .radar-dot { fill: #ec4899; filter: drop-shadow(0 0 4px rgba(236,72,153,0.6)); }
+        
+        /* 滚动条 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+        
+        /* 输入框 */
+        .input-glass {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            transition: all 0.3s;
+        }
+        .input-glass:focus {
+            background: rgba(255,255,255,0.1);
+            border-color: #8b5cf6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+        }
+        
+        /* 脉冲 */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        .pulse-ring::before {
+            content: ''; position: absolute; inset: -4px; border-radius: 50%;
+            border: 2px solid #ec4899;
+            animation: pulse-ring 2s infinite;
+        }
+        
+        /* 步骤指示器 */
+        .step-dot {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        .step-dot.active {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            border-color: transparent;
+            box-shadow: 0 0 12px rgba(139,92,246,0.4);
+        }
+        .step-dot.done {
+            background: #10b981; border-color: transparent;
+        }
+        .step-line {
+            flex: 1; height: 2px; background: rgba(255,255,255,0.1); margin: 0 8px;
+            transition: all 0.5s;
+        }
+        .step-line.done { background: linear-gradient(90deg, #8b5cf6, #ec4899); }
+        
+        /* 依恋表情按钮 */
+        .emoji-btn {
+            font-size: 2rem; padding: 0.5rem; border-radius: 16px;
+            background: rgba(255,255,255,0.03); border: 2px solid transparent;
+            transition: all 0.2s; cursor: pointer; filter: grayscale(0.6);
+        }
+        .emoji-btn:hover { transform: scale(1.15); filter: grayscale(0); background: rgba(255,255,255,0.08); }
+        .emoji-btn.selected { filter: grayscale(0); border-color: #ec4899; background: rgba(236,72,153,0.15); transform: scale(1.1); }
+        
+        /* 复制提示 */
+        .toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: rgba(16, 185, 129, 0.9); color: white; padding: 12px 24px; border-radius: 999px;
+            font-weight: 600; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 100;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- 背景光晕 -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+    
+    <div id="toast" class="toast">已复制到剪贴板</div>
+
+    <!-- 主容器 -->
+    <div class="relative z-10 min-h-screen flex flex-col p-4 max-w-lg mx-auto">
+        
+        <!-- 首页 -->
+        <div id="page-home" class="page active flex-1 flex flex-col justify-center items-center text-center">
+            <div class="mb-8 relative">
+                <div class="text-8xl mb-4 animate-bounce">🔮</div>
+                <div class="absolute inset-0 bg-purple-500 blur-3xl opacity-30 rounded-full"></div>
+            </div>
+            <h1 class="text-5xl font-black mb-3 tracking-tight">
+                <span class="text-gradient">灵魂匹配</span><br>
+                <span class="text-white">实验室</span>
+            </h1>
+            <p class="text-white/50 text-lg mb-10 max-w-xs leading-relaxed">
+                命运 · 性格 · 依恋 · 习惯<br>
+                <span class="text-white/30 text-sm">测测你们是真朋友还是塑料情</span>
+            </p>
+            
+            <div class="w-full space-y-4 max-w-xs">
+                <button onclick="app.startCreate()" class="btn-glow w-full py-4 rounded-2xl font-bold text-lg text-white shadow-2xl">
+                    ✨ 创建我的测试
+                </button>
+                <button onclick="app.checkJoin()" class="w-full py-4 rounded-2xl font-bold text-lg glass text-white/80 hover:text-white hover:bg-white/10 transition">
+                    💌 我收到了链接
+                </button>
+            </div>
+            
+            <div id="mock-hint" class="mt-8 text-xs text-white/20 hidden">
+                演示模式：请在新标签页打开邀请链接测试实时同步
+            </div>
+        </div>
+
+        <!-- 信息填写页 -->
+        <div id="page-profile" class="page flex-1 flex flex-col pt-12">
+            <button onclick="app.goHome()" class="text-white/40 hover:text-white text-sm mb-6 flex items-center gap-1 w-fit">
+                ← 返回
+            </button>
+            <h2 class="text-3xl font-bold mb-2">先认识一下</h2>
+            <p class="text-white/50 mb-8 text-sm" id="profile-subtitle">创建你的灵魂档案</p>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-white/70 mb-2">你的昵称</label>
+                    <input type="text" id="input-name" placeholder="例如：宇宙探索员" class="input-glass w-full px-4 py-3 rounded-xl text-lg">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-white/70 mb-2">出生日期</label>
+                    <input type="date" id="input-birth" class="input-glass w-full px-4 py-3 rounded-xl text-lg [color-scheme:dark]">
+                </div>
+                
+                <div id="birth-preview" class="hidden glass rounded-xl p-4 flex items-center gap-4">
+                    <div class="text-4xl" id="zodiac-emoji">♈</div>
+                    <div class="text-left">
+                        <div class="text-sm text-white/50">星盘解析</div>
+                        <div class="font-bold text-white" id="zodiac-text">白羊座 · 火象 · 阳性</div>
+                    </div>
+                </div>
+                
+                <button onclick="app.startQuiz()" class="btn-glow w-full py-4 rounded-2xl font-bold text-lg text-white mt-4">
+                    开始灵魂拷问 →
+                </button>
+            </div>
+        </div>
+
+        <!-- 答题页 -->
+        <div id="page-quiz" class="page flex-1 flex flex-col pt-8">
+            <!-- 步骤指示器 -->
+            <div class="flex items-center mb-8 px-2">
+                <div class="step-dot done" id="step-d1">✓</div>
+                <div class="step-line done" id="step-l1"></div>
+                <div class="step-dot active" id="step-d2">2</div>
+                <div class="step-line" id="step-l2"></div>
+                <div class="step-dot" id="step-d3">3</div>
+                <div class="step-line" id="step-l3"></div>
+                <div class="step-dot" id="step-d4">4</div>
+            </div>
+            
+            <div class="mb-2 flex justify-between items-end">
+                <span class="text-xs font-bold text-purple-300 tracking-wider uppercase" id="part-label">Part 2 · 性格认知</span>
+                <span class="text-sm text-white/40" id="q-counter">1 / 10</span>
+            </div>
+            
+            <!-- 进度条 -->
+            <div class="w-full h-1.5 bg-white/10 rounded-full mb-8 overflow-hidden">
+                <div id="quiz-progress" class="h-full progress-glow rounded-full" style="width: 0%"></div>
+            </div>
+            
+            <!-- 题目卡片 -->
+            <div class="glass-strong rounded-3xl p-6 mb-6 flex-1 flex flex-col justify-center min-h-[200px]">
+                <h3 id="q-text" class="text-xl font-bold leading-relaxed mb-6 text-white/90"></h3>
+                <div id="q-options" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- 命运展示页（Part 1 结果） -->
+        <div id="page-destiny" class="page flex-1 flex flex-col pt-12 items-center text-center">
+            <div class="text-6xl mb-4">✨</div>
+            <h2 class="text-2xl font-bold mb-2">命运维度已解锁</h2>
+            <p class="text-white/50 text-sm mb-8">基于你的出生年月，系统已计算星盘合盘参数</p>
+            
+            <div class="glass rounded-2xl p-6 w-full mb-6 grid grid-cols-3 gap-4">
+                <div class="text-center">
+                    <div class="text-3xl mb-1" id="destiny-zodiac">♈</div>
+                    <div class="text-xs text-white/50">太阳星座</div>
+                    <div class="font-bold text-sm" id="destiny-zodiac-name">白羊座</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl mb-1" id="destiny-animal">🐭</div>
+                    <div class="text-xs text-white/50">生肖</div>
+                    <div class="font-bold text-sm" id="destiny-animal-name">鼠</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl mb-1" id="destiny-stem">甲</div>
+                    <div class="text-xs text-white/50">年柱天干</div>
+                    <div class="font-bold text-sm" id="destiny-stem-name">甲木</div>
+                </div>
+            </div>
+            
+            <p class="text-white/40 text-xs mb-8 px-4">此维度将在好友参与后，与TA的星盘进行合盘运算</p>
+            
+            <button onclick="app.nextPart()" class="btn-glow w-full py-4 rounded-2xl font-bold text-lg text-white">
+                继续：性格测试 →
+            </button>
+        </div>
+
+        <!-- 等待页（创建者） -->
+        <div id="page-waiting" class="page flex-1 flex flex-col pt-8">
+            <div class="text-center mb-6">
+                <div class="inline-block relative mb-4">
+                    <div class="w-20 h-20 rounded-full glass-strong flex items-center justify-center text-4xl mx-auto" id="creator-avatar">👤</div>
+                    <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-[#302b63]"></div>
+                </div>
+                <h2 class="text-2xl font-bold" id="creator-name-display">小明</h2>
+                <p class="text-white/40 text-sm">等待好友挑战...</p>
+            </div>
+            
+            <!-- 邀请卡片 -->
+            <div class="glass rounded-2xl p-5 mb-6">
+                <div class="text-xs text-white/40 mb-2 uppercase tracking-wider">邀请链接</div>
+                <div class="flex gap-2">
+                    <div class="flex-1 bg-black/20 rounded-lg px-3 py-2 text-sm text-white/70 truncate font-mono" id="share-url"></div>
+                    <button onclick="app.copyLink()" class="bg-white/10 hover:bg-white/20 px-4 rounded-lg text-sm font-bold transition">复制</button>
+                </div>
+                <div class="mt-3 flex gap-2">
+                    <button onclick="app.shareToWechat()" class="flex-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 py-2 rounded-lg text-sm font-medium transition">
+                        微信分享
+                    </button>
+                    <button onclick="app.copyLink()" class="flex-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 py-2 rounded-lg text-sm font-medium transition">
+                        复制链接
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 实时好友列表 -->
+            <div class="flex-1">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-white/80">好友匹配列表</h3>
+                    <span class="text-xs text-white/30 bg-white/5 px-2 py-1 rounded-full" id="friend-count">0 人参与</span>
+                </div>
+                <div id="friend-list" class="space-y-3 pb-20">
+                    <div class="text-center text-white/20 text-sm py-8">
+                        暂无好友参与<br>
+                        <span class="text-xs">把链接发给好友，TA完成测试后会自动出现在这里</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果页（好友视角） -->
+        <div id="page-result" class="page flex-1 flex flex-col pt-6 pb-12">
+            <div class="text-center mb-6">
+                <div class="flex justify-center items-center gap-3 mb-4">
+                    <div class="text-center">
+                        <div class="w-14 h-14 rounded-full glass-strong flex items-center justify-center text-2xl mx-auto mb-1" id="res-avatar-1">👤</div>
+                        <div class="text-xs font-bold" id="res-name-1">我</div>
+                    </div>
+                    <div class="text-2xl text-pink-400 animate-pulse">💕</div>
+                    <div class="text-center">
+                        <div class="w-14 h-14 rounded-full glass-strong flex items-center justify-center text-2xl mx-auto mb-1" id="res-avatar-2">👤</div>
+                        <div class="text-xs font-bold" id="res-name-2">TA</div>
+                    </div>
+                </div>
+                
+                <div class="relative inline-block mb-2">
+                    <div class="text-7xl font-black text-gradient score-pop" id="res-score">0</div>
+                    <div class="text-sm text-white/40 mt-1">默契指数</div>
+                </div>
+                
+                <div class="inline-block glass px-4 py-1.5 rounded-full text-sm font-bold text-pink-300 mb-6" id="res-title">
+                    计算中...
+                </div>
+            </div>
+            
+            <!-- 雷达图 -->
+            <div class="glass rounded-2xl p-4 mb-4 flex justify-center">
+                <svg width="280" height="200" viewBox="0 0 280 200" id="radar-svg">
+                    <!-- 背景网格 -->
+                    <g id="radar-grid"></g>
+                    <!-- 数据 -->
+                    <polygon class="radar-poly" id="radar-poly" points=""/>
+                    <g id="radar-points"></g>
+                    <!-- 标签 -->
+                    <g id="radar-labels"></g>
+                </svg>
+            </div>
+            
+            <!-- 维度卡片 -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="glass rounded-xl p-3">
+                    <div class="text-xs text-white/40 mb-1">✨ 命运缘分</div>
+                    <div class="text-xl font-bold text-purple-300" id="dim-destiny">--</div>
+                </div>
+                <div class="glass rounded-xl p-3">
+                    <div class="text-xs text-white/40 mb-1">🧠 性格认知</div>
+                    <div class="text-xl font-bold text-cyan-300" id="dim-mbti">--</div>
+                </div>
+                <div class="glass rounded-xl p-3">
+                    <div class="text-xs text-white/40 mb-1">💕 恋爱人格</div>
+                    <div class="text-xl font-bold text-pink-300" id="dim-attach">--</div>
+                </div>
+                <div class="glass rounded-xl p-3">
+                    <div class="text-xs text-white/40 mb-1">☕ 生活习惯</div>
+                    <div class="text-xl font-bold text-yellow-300" id="dim-habit">--</div>
+                </div>
+            </div>
+            
+            <!-- 分析文案 -->
+            <div class="glass-strong rounded-2xl p-5 mb-6">
+                <p class="text-sm text-white/80 leading-relaxed" id="res-desc"></p>
+            </div>
+            
+            <button onclick="location.reload()" class="btn-glow w-full py-4 rounded-2xl font-bold text-lg text-white">
+                我也去测测别人 →
+            </button>
+        </div>
+
+        <!-- 详情页（创建者点击好友） -->
+        <div id="page-detail" class="page flex-1 flex flex-col pt-6 pb-12">
+            <button onclick="app.showWaiting()" class="text-white/40 hover:text-white text-sm mb-4 flex items-center gap-1 w-fit">
+                ← 返回列表
+            </button>
+            <div id="detail-content"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // ==================== 配置区 ====================
+        // 如需跨设备实时同步，请访问 https://firebase.google.com 创建免费项目，
+        // 开启 Realtime Database，复制配置对象替换下方占位符。
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        // ==================== MockDB（演示模式） ====================
+        class MockDB {
+            constructor() {
+                this.data = JSON.parse(localStorage.getItem('soulmatch_mock') || '{}');
+                this.listeners = {};
+                this.channel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('soulmatch') : null;
+                if (this.channel) {
+                    this.channel.onmessage = (e) => {
+                        if (e.data.type === 'update') {
+                            this.data = JSON.parse(localStorage.getItem('soulmatch_mock') || '{}');
+                            Object.keys(this.listeners).forEach(p => this._trigger(p));
+                        }
+                    };
+                }
+                // 轮询兜底
+                setInterval(() => {
+                    const latest = JSON.parse(localStorage.getItem('soulmatch_mock') || '{}');
+                    if (JSON.stringify(latest) !== JSON.stringify(this.data)) {
+                        this.data = latest;
+                        Object.keys(this.listeners).forEach(p => this._trigger(p));
+                    }
+                }, 800);
+            }
+            ref(path) {
+                return {
+                    set: (val) => {
+                        this._set(path, val);
+                        localStorage.setItem('soulmatch_mock', JSON.stringify(this.data));
+                        if (this.channel) this.channel.postMessage({type:'update'});
+                    },
+                    on: (event, cb) => {
+                        this.listeners[path] = cb;
+                        this._trigger(path);
+                    }
+                };
+            }
+            _set(path, val) {
+                const parts = path.split('/').filter(Boolean);
+                let cur = this.data;
+                for (let i=0; i<parts.length-1; i++) {
+                    if (!cur[parts[i]]) cur[parts[i]] = {};
+                    cur = cur[parts[i]];
+                }
+                cur[parts[parts.length-1]] = val;
+            }
+            _get(path) {
+                const parts = path.split('/').filter(Boolean);
+                let cur = this.data;
+                for (let p of parts) { if (!cur) return null; cur = cur[p]; }
+                return cur;
+            }
+            _trigger(path) {
+                const val = this._get(path);
+                if (this.listeners[path]) this.listeners[path](val ? {val:()=>val} : null);
+            }
+        }
+        
+        // ==================== 应用主逻辑 ====================
+        const app = {
+            db: null,
+            useMock: true,
+            state: {
+                mode: 'creator', // creator / joiner
+                roomId: null,
+                user: { name: '', birthday: '', zodiac: '', animal: '', stem: '' },
+                answers: { part2: [], part3: [], part4: [] },
+                currentPart: 1,
+                currentQ: 0,
+                creatorData: null,
+                joinerId: null
+            },
+            
+            // 题目库
+            questions: {
+                part2: [
+                    { q: "当你计划一次旅行时，你最先启动的思维是？", opts: [
+                        {t:"搜索过往经验，复用成功模式", f:"Si"}, {t:"想象各种意外联结与可能性", f:"Ne"},
+                        {t:"锁定当下最刺激的感官体验", f:"Se"}, {t:"内心浮现整体意象，再填充细节", f:"Ni"}
+                    ]},
+                    { q: "朋友向你哭诉职场不公，你第一反应是？", opts: [
+                        {t:"分析权力结构，指出反击策略", f:"Te"}, {t:"判断是否违背核心价值观", f:"Fi"},
+                        {t:"立刻共情，营造拥抱氛围", f:"Fe"}, {t:"拆解逻辑漏洞，帮TA看清偏差", f:"Ti"}
+                    ]},
+                    { q: "面对一个复杂新项目，你更依赖？", opts: [
+                        {t:"建立时间表、KPI和问责机制", f:"Te"}, {t:"持续头脑风暴，碰撞新方向", f:"Ne"},
+                        {t:"信任身体直觉，边做边调整", f:"Se"}, {t:"脑中预演完整闭环再行动", f:"Ni"}
+                    ]},
+                    { q: "回忆童年时，你更常想起？", opts: [
+                        {t:"具体仪式、食物味道、街道布局", f:"Si"}, {t:"一种朦胧的'整体氛围'", f:"Ni"},
+                        {t:"当时没做成但至今遗憾的可能", f:"Ne"}, {t:"自由奔跑或触摸自然的瞬间", f:"Se"}
+                    ]},
+                    { q: "在亲密关系中，你更难容忍的是？", opts: [
+                        {t:"伴侣长期缺乏人生目标", f:"Ni"}, {t:"伴侣在公开场合让你难堪", f:"Fe"},
+                        {t:"伴侣的逻辑自相矛盾且拒绝反思", f:"Ti"}, {t:"伴侣强迫你放弃爱好迎合TA", f:"Fi"}
+                    ]},
+                    { q: "周末独处时，你最可能？", opts: [
+                        {t:"整理相册、复盘本周、做meal prep", f:"Si"}, {t:"看存在主义电影，写私人感悟", f:"Ni"},
+                        {t:"随机参加陌生人聚会", f:"Ne"}, {t:"拆解坏电器搞懂原理", f:"Ti"}
+                    ]},
+                    { q: "做重大决定时，你最终依靠？", opts: [
+                        {t:"数据、先例和风险收益比", f:"Te"}, {t:"是否符合'我想成为的人'", f:"Fi"},
+                        {t:"对身边重要他人的影响与责任", f:"Fe"}, {t:"概念体系内部是否自洽", f:"Ti"}
+                    ]},
+                    { q: "你对'改变'的态度是？", opts: [
+                        {t:"必须服务于明确的绩效提升", f:"Te"}, {t:"发现隐藏可能性的唯一途径", f:"Ne"},
+                        {t:"让我脱离舒适区，除非被迫否则抗拒", f:"Si"}, {t:"内在愿景成熟的自然外化", f:"Ni"}
+                    ]},
+                    { q: "当伴侣说'你根本不懂我'，你认为？", opts: [
+                        {t:"我提供的解决方案不够实际", f:"Te"}, {t:"我没有准确反映TA的情绪状态", f:"Fe"},
+                        {t:"我的价值观表达让TA感到被评判", f:"Fi"}, {t:"我的分析框架遗漏了TA的主观逻辑", f:"Ti"}
+                    ]},
+                    { q: "如果人生只剩一年，你会？", opts: [
+                        {t:"列出遗愿清单并高效执行", f:"Te"}, {t:"深度连接几个重要的人", f:"Fe"},
+                        {t:"独自去想去的地方按自己节奏感受", f:"Fi"}, {t:"写一本书把毕生思考留给世界", f:"Ti"}
+                    ]}
+                ],
+                part3: [
+                    // 焦虑维度
+                    { q: "当伴侣没有立即回复消息时，你通常会？", dim: "anxiety", opts: [
+                        {t:"完全不在意", s:1}, {t:"稍感不安", s:2}, {t:"反复查看手机", s:3}, {t:"感到焦虑", s:4}, {t:"恐慌，脑补分手", s:5}
+                    ]},
+                    { q: "在关系中，你有多需要伴侣反复确认'爱你'？", dim: "anxiety", opts: [
+                        {t:"从不主动索要", s:1}, {t:"偶尔需要", s:2}, {t:"希望每周/每月表达", s:3}, {t:"需要每天听到", s:4}, {t:"即使每天听到仍怀疑", s:5}
+                    ]},
+                    { q: "当伴侣需要独处空间时，你的感受是？", dim: "anxiety", opts: [
+                        {t:"松了一口气", s:1}, {t:"理解，但会想念", s:2}, {t:"有点失落", s:3}, {t:"担心关系出了问题", s:4}, {t:"极度恐慌", s:5}
+                    ]},
+                    { q: "你是否经常担心伴侣对你的兴趣在减退？", dim: "anxiety", opts: [
+                        {t:"从不", s:1}, {t:"很少", s:2}, {t:"有时", s:3}, {t:"经常", s:4}, {t:"几乎每天", s:5}
+                    ]},
+                    { q: "吵架后，你更可能？", dim: "anxiety", opts: [
+                        {t:"等冷静后再说", s:1}, {t:"希望尽快解决", s:2}, {t:"立刻追着要结果", s:3}, {t:"情绪崩溃", s:4}, {t:"威胁分手测试TA", s:5}
+                    ]},
+                    // 回避维度
+                    { q: "当伴侣向你倾诉深层情绪时，你的本能是？", dim: "avoidance", opts: [
+                        {t:"完全接纳，深入交流", s:1}, {t:"倾听并尝试理解", s:2}, {t:"有点不自在但仍陪伴", s:3}, {t:"急于提供解决方案", s:4}, {t:"极度不适，想逃离", s:5}
+                    ]},
+                    { q: "你对'两个人融为一体'这种说法的感觉？", dim: "avoidance", opts: [
+                        {t:"浪漫且向往", s:1}, {t:"温暖，但保留自我", s:2}, {t:"有点肉麻", s:3}, {t:"警惕，担心失去独立", s:4}, {t:"恐惧，必须保持完全独立", s:5}
+                    ]},
+                    { q: "当关系变得'太亲密'时，你会？", dim: "avoidance", opts: [
+                        {t:"享受并推进", s:1}, {t:"顺其自然", s:2}, {t:"偶尔需要透口气", s:3}, {t:"刻意减少联系频率", s:4}, {t:"突然冷淡或挑起争端", s:5}
+                    ]},
+                    { q: "向伴侣说'我需要你'对你来说？", dim: "avoidance", opts: [
+                        {t:"很自然，经常表达", s:1}, {t:"可以开口", s:2}, {t:"有点尴尬", s:3}, {t:"非常困难", s:4}, {t:"绝不可能", s:5}
+                    ]},
+                    { q: "回忆童年与照顾者的关系，你更倾向？", dim: "avoidance", opts: [
+                        {t:"温暖可靠，随时可依赖", s:1}, {t:"总体稳定", s:2}, {t:"记不清或复杂", s:3}, {t:"倾向自己解决问题", s:4}, {t:"照顾者不可靠，早早学会不依赖", s:5}
+                    ]}
+                ],
+                part4: [
+                    { q: "你的典型作息是？", opts: ["严格晨型人，6-7点起","轻度晨型，8点前起","轻度夜型，9-10点起","严格夜型，午后起"] },
+                    { q: "你对居住空间整洁度的底线是？", opts: ["必须一尘不染","大体整洁","功能性乱","混乱即灵感"] },
+                    { q: "面对一笔意外之财（1万元），你会？", opts: ["全部存入理财","70%储蓄30%奖励","50%存50%花","全部花掉或旅行"] },
+                    { q: "你理想的社交频率是？", opts: ["每天都需要互动","每周3-4次","每周1-2次深度交流","每月1-2次"] },
+                    { q: "发生冲突时，你更倾向？", opts: ["必须立即解决","当天解决","等1-3天","能避则避"] },
+                    { q: "你对伴侣'已读不回'的容忍度？", opts: ["完全不能忍","半天内不回不安","1-2天可接受","完全无所谓"] },
+                    { q: "你的饮食/健康观念是？", opts: ["严格计算卡路里","大体健康","想吃就吃","抗拒一切健康规则"] },
+                    { q: "面对一个空白周末，你会？", opts: ["提前3天排满","有1-2个主事件","当天早上决定","彻底空白"] },
+                    { q: "你对'伴侣翻看手机'的态度？", opts: ["完全开放","被要求不会拒绝","不舒服","绝对禁区"] },
+                    { q: "你更倾向哪种休闲消费？", opts: ["购买实体资产","购买课程技能","购买体验","极简消费"] }
+                ]
+            },
+            
+            init() {
+                // 检测Firebase配置
+                if (!firebaseConfig.apiKey.includes("YOUR")) {
+                    try {
+                        firebase.initializeApp(firebaseConfig);
+                        this.db = firebase.database();
+                        this.useMock = false;
+                    } catch(e) {
+                        console.log("Firebase初始化失败，使用演示模式");
+                        this.db = new MockDB();
+                    }
+                } else {
+                    this.db = new MockDB();
+                    document.getElementById('mock-hint').classList.remove('hidden');
+                }
+                
+                // 解析URL参数
+                const url = new URL(location.href);
+                const room = url.searchParams.get('room');
+                if (room) {
+                    this.state.mode = 'joiner';
+                    this.state.roomId = room;
+                    // 预加载创建者信息
+                    this.db.ref(`rooms/${room}/creator`).on('value', snap => {
+                        if (snap && snap.val()) {
+                            this.state.creatorData = snap.val();
+                        }
+                    });
+                }
+                
+                // 生日输入监听
+                document.getElementById('input-birth').addEventListener('change', (e) => {
+                    this.updateBirthPreview(e.target.value);
+                });
+            },
+            
+            // ==================== 页面切换 ====================
+            showPage(id) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                setTimeout(() => {
+                    document.getElementById(id).classList.add('active');
+                }, 50);
+            },
+            goHome() { location.reload(); },
+            startCreate() {
+                this.state.mode = 'creator';
+                document.getElementById('profile-subtitle').textContent = '创建你的灵魂档案';
+                this.showPage('page-profile');
+            },
+            checkJoin() {
+                const saved = localStorage.getItem('soulmatch_last_room');
+                if (saved && confirm(`检测到上次访问的房间 ${saved}，是否进入？`)) {
+                    location.search = `?room=${saved}`;
+                    return;
+                }
+                alert('请让好友发送邀请链接给你，点击链接即可进入！');
+            },
+            
+            // ==================== 生日与命运 ====================
+            updateBirthPreview(dateStr) {
+                if (!dateStr) return;
+                const d = new Date(dateStr);
+                const z = this.getZodiac(d.getMonth()+1, d.getDate());
+                const a = this.getAnimal(d.getFullYear());
+                const s = this.getStem(d.getFullYear());
+                
+                document.getElementById('zodiac-emoji').textContent = z.emoji;
+                document.getElementById('zodiac-text').textContent = `${z.name} · ${z.elem}象 · ${z.pol}性`;
+                document.getElementById('birth-preview').classList.remove('hidden');
+                
+                this.state.user.zodiac = z.name;
+                this.state.user.animal = a;
+                this.state.user.stem = s;
+            },
+            getZodiac(m, d) {
+                const signs = [
+                    {name:'摩羯座',emoji:'♑',elem:'土',pol:'阴',date:[1,19]}, {name:'水瓶座',emoji:'♒',elem:'风',pol:'阳',date:[2,18]},
+                    {name:'双鱼座',emoji:'♓',elem:'水',pol:'阴',date:[3,20]}, {name:'白羊座',emoji:'♈',elem:'火',pol:'阳',date:[4,19]},
+                    {name:'金牛座',emoji:'♉',elem:'土',pol:'阴',date:[5,20]}, {name:'双子座',emoji:'♊',elem:'风',pol:'阳',date:[6,21]},
+                    {name:'巨蟹座',emoji:'♋',elem:'水',pol:'阴',date:[7,22]}, {name:'狮子座',emoji:'♌',elem:'火',pol:'阳',date:[8,22]},
+                    {name:'处女座',emoji:'♍',elem:'土',pol:'阴',date:[9,22]}, {name:'天秤座',emoji:'♎',elem:'风',pol:'阳',date:[10,23]},
+                    {name:'天蝎座',emoji:'♏',elem:'水',pol:'阴',date:[11,21]}, {name:'射手座',emoji:'♐',elem:'火',pol:'阳',date:[12,21]},
+                    {name:'摩羯座',emoji:'♑',elem:'土',pol:'阴',date:[12,31]}
+                ];
+                for (let s of signs) {
+                    if (m === s.date[0] && d <= s.date[1]) return s;
+                    if (m === s.date[0]-1 && d > signs[signs.indexOf(s)-1]?.date[1]) return s;
+                }
+                return signs[0];
+            },
+            getAnimal(year) {
+                const animals = ['猴','鸡','狗','猪','鼠','牛','虎','兔','龙','蛇','马','羊'];
+                return animals[year % 12];
+            },
+            getStem(year) {
+                const stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+                const elements = ['木','木','火','火','土','土','金','金','水','水'];
+                const s = stems[year % 10];
+                return {name: s, elem: elements[year%10], full: s+elements[year%10]};
+            },
+            
+            // ==================== 答题流程 ====================
+            startQuiz() {
+                const name = document.getElementById('input-name').value.trim();
+                const birth = document.getElementById('input-birth').value;
+                if (!name || !birth) { alert('请填写完整信息'); return; }
+                
+                this.state.user.name = name;
+                this.state.user.birthday = birth;
+                
+                if (this.state.mode === 'creator') {
+                    // 创建者先展示命运，再进入Part2
+                    this.showDestinyPreview();
+                } else {
+                    // 参与者直接进入Part2
+                    this.state.currentPart = 2;
+                    this.state.currentQ = 0;
+                    this.renderQuestion();
+                    this.showPage('page-quiz');
+                }
+            },
+            showDestinyPreview() {
+                const d = new Date(this.state.user.birthday);
+                const z = this.getZodiac(d.getMonth()+1, d.getDate());
+                const a = this.getAnimal(d.getFullYear());
+                const s = this.getStem(d.getFullYear());
+                document.getElementById('destiny-zodiac').textContent = z.emoji;
+                document.getElementById('destiny-zodiac-name').textContent = z.name;
+                document.getElementById('destiny-animal').textContent = ['🐵','🐔','🐶','🐷','🐭','🐮','🐯','🐰','🐲','🐍','🐴','🐑'][d.getFullYear()%12];
+                document.getElementById('destiny-animal-name').textContent = a;
+                document.getElementById('destiny-stem').textContent = s.name;
+                document.getElementById('destiny-stem-name').textContent = s.full;
+                this.showPage('page-destiny');
+            },
+            nextPart() {
+                this.state.currentPart = 2;
+                this.state.currentQ = 0;
+                this.renderQuestion();
+                this.showPage('page-quiz');
+            },
+            renderQuestion() {
+                const part = this.state.currentPart;
+                const qIdx = this.state.currentQ;
+                let q, isEmoji = false;
+                
+                // 更新步骤指示器
+                this.updateSteps();
+                
+                if (part === 2) {
+                    q = this.questions.part2[qIdx];
+                    document.getElementById('part-label').textContent = 'Part 2 · 性格认知';
+                    document.getElementById('q-counter').textContent = `${qIdx+1} / ${this.questions.part2.length}`;
+                } else if (part === 3) {
+                    q = this.questions.part3[qIdx];
+                    document.getElementById('part-label').textContent = 'Part 3 · 恋爱人格';
+                    document.getElementById('q-counter').textContent = `${qIdx+1} / ${this.questions.part3.length}`;
+                    isEmoji = true;
+                } else {
+                    q = this.questions.part4[qIdx];
+                    document.getElementById('part-label').textContent = 'Part 4 · 生活习惯';
+                    document.getElementById('q-counter').textContent = `${qIdx+1} / ${this.questions.part4.length}`;
+                }
+                
+                // 进度条
+                const totalQ = 30; // 10+10+10
+                const currentTotal = (part-2)*10 + qIdx;
+                document.getElementById('quiz-progress').style.width = `${(currentTotal/30)*100}%`;
+                
+                // 题目
+                document.getElementById('q-text').textContent = q.q;
+                const optsDiv = document.getElementById('q-options');
+                optsDiv.innerHTML = '';
+                
+                if (isEmoji) {
+                    // 依恋题：5个表情按钮
+                    const emojis = ['😌','🙂','😕','😟','😰'];
+                    const labels = ['完全不会','偶尔','有时','经常','总是'];
+                    const row = document.createElement('div');
+                    row.className = 'flex justify-between gap-2';
+                    q.opts.forEach((opt, i) => {
+                        const btn = document.createElement('button');
+                        btn.className = 'emoji-btn flex-1 flex flex-col items-center gap-1';
+                        btn.innerHTML = `<span>${emojis[i]}</span><span class="text-[10px] text-white/40">${labels[i]}</span>`;
+                        btn.onclick = () => this.selectOption(i, opt.s, btn);
+                        row.appendChild(btn);
+                    });
+                    optsDiv.appendChild(row);
+                } else if (part === 2) {
+                    // MBTI题：4选项
+                    q.opts.forEach((opt, i) => {
+                        const div = document.createElement('div');
+                        div.className = 'option-card rounded-xl p-4 text-sm text-white/80 font-medium';
+                        div.textContent = opt.t;
+                        div.onclick = () => this.selectOption(i, opt.f, div);
+                        optsDiv.appendChild(div);
+                    });
+                } else {
+                    // 习惯题：4选项
+                    q.opts.forEach((opt, i) => {
+                        const div = document.createElement('div');
+                        div.className = 'option-card rounded-xl p-4 text-sm text-white/80 font-medium';
+                        div.textContent = opt;
+                        div.onclick = () => this.selectOption(i, i, div);
+                        optsDiv.appendChild(div);
+                    });
+                }
+            },
+            updateSteps() {
+                const p = this.state.currentPart;
+                document.getElementById('step-d1').className = 'step-dot done';
+                document.getElementById('step-l1').className = 'step-line done';
+                document.getElementById('step-d2').className = p === 2 ? 'step-dot active' : (p > 2 ? 'step-dot done' : 'step-dot');
+                document.getElementById('step-l2').className = p > 2 ? 'step-line done' : 'step-line';
+                document.getElementById('step-d3').className = p === 3 ? 'step-dot active' : (p > 3 ? 'step-dot done' : 'step-dot');
+                document.getElementById('step-l3').className = p > 3 ? 'step-line done' : 'step-line';
+                document.getElementById('step-d4').className = p === 4 ? 'step-dot active' : 'step-dot';
+            },
+            selectOption(idx, val, el) {
+                // 视觉反馈
+                if (el.parentElement.querySelector('.selected')) {
+                    el.parentElement.querySelectorAll('.selected').forEach(s => s.classList.remove('selected'));
+                }
+                el.classList.add('selected');
+                
+                // 记录答案
+                if (this.state.currentPart === 2) this.state.answers.part2.push(val);
+                else if (this.state.currentPart === 3) this.state.answers.part3.push(val);
+                else this.state.answers.part4.push(val);
+                
+                // 自动下一题
+                setTimeout(() => {
+                    this.state.currentQ++;
+                    const part = this.state.currentPart;
+                    const maxQ = part === 2 ? 10 : (part === 3 ? 10 : 10);
+                    if (this.state.currentQ >= maxQ) {
+                        if (part < 4) {
+                            this.state.currentPart++;
+                            this.state.currentQ = 0;
+                        } else {
+                            this.finishQuiz();
+                            return;
+                        }
+                    }
+                    this.renderQuestion();
+                }, 400);
+            },
+            finishQuiz() {
+                // 计算个人结果
+                this.state.user.mbti = this.calcMBTI(this.state.answers.part2);
+                const attach = this.calcAttachment(this.state.answers.part3);
+                this.state.user.attachment = attach.type;
+                this.state.user.attachmentScore = attach;
+                
+                if (this.state.mode === 'creator') {
+                    // 创建房间
+                    this.state.roomId = 'R' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                    const roomData = {
+                        creator: {
+                            name: this.state.user.name,
+                            birthday: this.state.user.birthday,
+                            zodiac: this.state.user.zodiac,
+                            animal: this.state.user.animal,
+                            stem: this.state.user.stem,
+                            mbti: this.state.user.mbti,
+                            attachment: this.state.user.attachment,
+                            attachmentScore: this.state.user.attachmentScore,
+                            answers: this.state.answers,
+                            timestamp: Date.now()
+                        },
+                        joiners: {}
+                    };
+                    this.db.ref(`rooms/${this.state.roomId}`).set(roomData);
+                    localStorage.setItem('soulmatch_last_room', this.state.roomId);
+                    this.showWaiting();
+                } else {
+                    // 参与者：计算与创建者的匹配，写入joiners
+                    this.state.joinerId = 'J' + Math.random().toString(36).substr(2, 4);
+                    const joinerData = {
+                        name: this.state.user.name,
+                        birthday: this.state.user.birthday,
+                        zodiac: this.state.user.zodiac,
+                        animal: this.state.user.animal,
+                        stem: this.state.user.stem,
+                        mbti: this.state.user.mbti,
+                        attachment: this.state.user.attachment,
+                        attachmentScore: this.state.user.attachmentScore,
+                        answers: this.state.answers,
+                        timestamp: Date.now()
+                    };
+                    this.db.ref(`rooms/${this.state.roomId}/joiners/${this.state.joinerId}`).set(joinerData);
+                    
+                    // 计算并显示结果
+                    const result = this.calcMatch(this.state.creatorData, joinerData);
+                    this.renderResult(result, this.state.creatorData, joinerData);
+                }
+            },
+            
+            // ==================== 计算逻辑 ====================
+            calcMBTI(answers) {
+                // answers是10个功能代码的数组
+                const scores = {Ni:0, Ne:0, Si:0, Se:0, Ti:0, Te:0, Fi:0, Fe:0};
+                answers.forEach(f => scores[f]++);
+                const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+                const dom = sorted[0][0];
+                const aux = sorted[1][0];
+                // 简化映射到类型（仅用于功能栈推导）
+                const map = {
+                    'Ni-Te':'INTJ', 'Te-Ni':'ENTJ', 'Ni-Fe':'INFJ', 'Fe-Ni':'ENFJ',
+                    'Ne-Ti':'ENTP', 'Ti-Ne':'INTP', 'Ne-Fi':'ENFP', 'Fi-Ne':'INFP',
+                    'Si-Te':'ISTJ', 'Te-Si':'ESTJ', 'Si-Fe':'ISFJ', 'Fe-Si':'ESFJ',
+                    'Se-Ti':'ISTP', 'Ti-Se':'ESTP', 'Se-Fi':'ISFP', 'Fi-Se':'ESFP'
+                };
+                return map[`${dom}-${aux}`] || 'INTJ';
+            },
+            calcAttachment(answers) {
+                // answers是10个数字（1-5），前5焦虑，后5回避
+                const anxiety = answers.slice(0,5).reduce((a,b)=>a+b,0);
+                const avoidance = answers.slice(5,10).reduce((a,b)=>a+b,0);
+                const anxNorm = (anxiety / 25) * 100;
+                const avdNorm = (avoidance / 25) * 100;
+                let type = 'secure';
+                if (anxNorm >= 60 && avdNorm >= 60) type = 'fearful';
+                else if (anxNorm >= 60) type = 'anxious';
+                else if (avdNorm >= 60) type = 'avoidant';
+                return {type, anxiety: anxNorm, avoidance: avdNorm};
+            },
+            
+            // 核心匹配算法
+            calcMatch(c, j) {
+                // 1. 命运
+                const destiny = this.calcDestinyMatch(c.birthday, j.birthday);
+                // 2. MBTI
+                const mbti = this.calcMBTIMatch(c.mbti, j.mbti);
+                // 3. 依恋
+                const attach = this.calcAttachMatch(c.attachment, j.attachment);
+                // 4. 习惯
+                const habit = this.calcHabitMatch(c.answers.part4, j.answers.part4);
+                
+                let total = destiny * 0.15 + mbti * 0.35 + attach * 0.30 + habit * 0.20;
+                
+                // 危险修正
+                if ((c.attachment==='anxious'&&j.attachment==='avoidant') || 
+                    (c.attachment==='avoidant'&&j.attachment==='anxious')) total -= 18;
+                if (c.attachment==='fearful' && j.attachment==='fearful') total -= 15;
+                
+                const s1 = this.getStack(c.mbti);
+                const s2 = this.getStack(j.mbti);
+                if (s1 && s2) {
+                    const conflicts = [['Te','Fi'],['Fi','Te'],['Fe','Ti'],['Ti','Fe']];
+                    if (conflicts.some(([a,b]) => (s1[0]===a && s2[0]===b))) total -= 12;
+                }
+                
+                return {
+                    destiny, mbti, attach, habit,
+                    total: Math.max(20, Math.min(100, Math.round(total)))
+                };
+            },
+            getStack(type) {
+                const stacks = {
+                    INTJ:['Ni','Te','Fi','Se'], ENTJ:['Te','Ni','Se','Fi'],
+                    INFJ:['Ni','Fe','Ti','Se'], ENFJ:['Fe','Ni','Se','Ti'],
+                    INTP:['Ti','Ne','Si','Fe'], ENTP:['Ne','Ti','Fe','Si'],
+                    INFP:['Fi','Ne','Si','Te'], ENFP:['Ne','Fi','Te','Si'],
+                    ISTJ:['Si','Te','Fi','Ne'], ESTJ:['Te','Si','Ne','Fi'],
+                    ISFJ:['Si','Fe','Ti','Ne'], ESFJ:['Fe','Si','Ne','Ti'],
+                    ISTP:['Ti','Se','Ni','Fe'], ESTP:['Se','Ti','Fe','Ni'],
+                    ISFP:['Fi','Se','Ni','Te'], ESFP:['Se','Fi','Te','Ni']
+                };
+                return stacks[type];
+            },
+            calcDestinyMatch(b1, b2) {
+                const d1 = new Date(b1), d2 = new Date(b2);
+                const z1 = this.getZodiac(d1.getMonth()+1, d1.getDate());
+                const z2 = this.getZodiac(d2.getMonth()+1, d2.getDate());
+                
+                // 星座合盘
+                let zScore = 5; // 默认对立元素
+                if (z1.name === z2.name) zScore = 25;
+                else if (z1.elem === z2.elem) zScore = 25;
+                else if ((z1.elem==='火'&&z2.elem==='风')||(z1.elem==='风'&&z2.elem==='火')||
+                         (z1.elem==='水'&&z2.elem==='土')||(z1.elem==='土'&&z2.elem==='水')) zScore = 20;
+                else if (z1.pol === z2.pol) zScore = 10;
+                
+                // 对宫检测
+                const opposites = [['白羊座','天秤座'],['金牛座','天蝎座'],['双子座','射手座'],
+                                   ['巨蟹座','摩羯座'],['狮子座','水瓶座'],['处女座','双鱼座']];
+                if (opposites.some(([a,b]) => (z1.name===a&&z2.name===b)||(z1.name===b&&z2.name===a))) zScore = 15;
+                
+                // 八字简化
+                const a1 = d1.getFullYear() % 12, a2 = d2.getFullYear() % 12;
+                const s1 = d1.getFullYear() % 10, s2 = d2.getFullYear() % 10;
+                let cScore = 0;
+                // 六合
+                const liuhe = [[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]]; // 猴鸡狗猪鼠牛虎兔龙蛇马羊
+                if (liuhe.some(([x,y]) => (a1===x&&a2===y)||(a1===y&&a2===x))) cScore = 20;
+                // 三合（简化检测）
+                const sanhe = [[0,4,8],[1,5,9],[2,6,10],[3,7,11]]; // 猴鼠龙等
+                if (sanhe.some(g => g.includes(a1) && g.includes(a2) && a1!==a2)) cScore = 15;
+                // 天干相生（简化：相邻为相生）
+                if (Math.abs(s1-s2) === 1) cScore = Math.max(cScore, 10);
+                // 相冲
+                const chong = [[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]];
+                if (chong.some(([x,y]) => (a1===x&&a2===y)||(a1===y&&a2===x))) cScore = -10;
+                
+                return Math.max(0, Math.min(100, (zScore * 0.6 + cScore * 0.4) * 4));
+            },
+            calcMBTIMatch(t1, t2) {
+                if (!t1 || !t2) return 50;
+                const s1 = this.getStack(t1);
+                const s2 = this.getStack(t2);
+                if (!s1 || !s2) return 50;
+                
+                // 金对
+                if (s1[0]===s2[3] && s1[1]===s2[2] && s1[2]===s2[1] && s1[3]===s2[0]) return 95;
+                // 功能轴匹配（共享2+功能）
+                const set1 = new Set(s1), set2 = new Set(s2);
+                const common = [...set1].filter(x => set2.has(x));
+                if (common.length >= 2) return 80;
+                // 主导-辅助互换
+                if (s1[0]===s2[1] && s1[1]===s2[0]) return 75;
+                // 串联互补
+                const tandem = {'Ne':'Si','Si':'Ne','Se':'Ni','Ni':'Se','Te':'Fi','Fi':'Te','Fe':'Ti','Ti':'Fe'};
+                if (tandem[s1[0]] === s2[0]) return 70;
+                // 同型
+                if (t1 === t2) return 60;
+                // 主导冲突
+                const conflicts = [['Te','Fi'],['Fi','Te'],['Fe','Ti'],['Ti','Fe']];
+                if (conflicts.some(([a,b]) => (s1[0]===a && s2[0]===b))) return 40;
+                
+                return 55;
+            },
+            calcAttachMatch(a1, a2) {
+                const matrix = {
+                    'secure-secure':100, 'secure-anxious':75, 'secure-avoidant':65, 'secure-fearful':60,
+                    'anxious-anxious':45, 'avoidant-avoidant':40, 'anxious-avoidant':30,
+                    'fearful-fearful':35, 'anxious-fearful':40, 'avoidant-fearful':45
+                };
+                const key1 = `${a1}-${a2}`;
+                const key2 = `${a2}-${a1}`;
+                return matrix[key1] || matrix[key2] || 50;
+            },
+            calcHabitMatch(a1, a2) {
+                const weights = [1.5, 1.5, 1.3, 1.0, 1.5, 1.0, 1.0, 1.3, 1.0, 1.0];
+                let total = 0, max = 0;
+                for (let i=0; i<10; i++) {
+                    const d = Math.abs(a1[i] - a2[i]);
+                    let score = d===0 ? 10 : d===1 ? 7 : d===2 ? 3 : -2;
+                    total += score * weights[i];
+                    max += 10 * weights[i];
+                }
+                if (a1[4]===a2[4] && a1[4]===0) total -= 3;
+                if (a1[4]===a2[4] && a1[4]===3) total -= 5;
+                if (Math.abs(a1[0]-a2[0]) <= 1) total += 5;
+                return Math.max(0, Math.min(100, (total/max)*100));
+            },
+            
+            // ==================== 结果渲染 ====================
+            renderResult(result, c, j) {
+                document.getElementById('res-avatar-1').textContent = '👤';
+                document.getElementById('res-name-1').textContent = j.name;
+                document.getElementById('res-avatar-2').textContent = '👤';
+                document.getElementById('res-name-2').textContent = c.name;
+                
+                // 分数动画
+                const scoreEl = document.getElementById('res-score');
+                let cur = 0;
+                const animate = () => {
+                    cur += 2;
+                    if (cur > result.total) cur = result.total;
+                    scoreEl.textContent = cur;
+                    if (cur < result.total) requestAnimationFrame(animate);
+                };
+                requestAnimationFrame(animate);
+                
+                // 标题
+                const titles = {
+                    high: ['天选之合','灵魂伴侣','神仙配置'],
+                    mid: ['默契搭档','潜力股组合','互补型好友'],
+                    low: ['相爱相杀','深度试炼','缘分奇妙']
+                };
+                let pool = result.total >= 80 ? titles.high : result.total >= 60 ? titles.mid : titles.low;
+                document.getElementById('res-title').textContent = pool[result.total % pool.length];
+                
+                // 维度分
+                document.getElementById('dim-destiny').textContent = Math.round(result.destiny);
+                document.getElementById('dim-mbti').textContent = Math.round(result.mbti);
+                document.getElementById('dim-attach').textContent = Math.round(result.attach);
+                document.getElementById('dim-habit').textContent = Math.round(result.habit);
+                
+                // 雷达图
+                this.drawRadar([result.destiny, result.mbti, result.attach, result.habit]);
+                
+                // 文案
+                const descs = [
+                    `你们的匹配指数为${result.total}%。${result.mbti >= 80 ? '认知功能高度契合，沟通成本极低。' : ''}${result.attach >= 80 ? '依恋系统同频，能提供彼此安全基地。' : result.attach < 50 ? '依恋风格存在张力，建议建立'冲突修复仪式'。' : ''}${result.habit >= 80 ? '生活节奏和谐，同居/合作摩擦小。' : ''}`,
+                    `在命运维度（${Math.round(result.destiny)}分）上，${result.destiny >= 70 ? '你们的星盘与八字呈现良性互动。' : '文化脚本差异较大，需要更多包容。'}性格维度（${Math.round(result.mbti)}分）显示${result.mbti >= 80 ? '功能栈互补，一方之长短恰为另一方之优劣。' : '存在认知盲区，需刻意练习换位思考。'}`
+                ];
+                document.getElementById('res-desc').textContent = descs[0];
+                
+                this.showPage('page-result');
+            },
+            drawRadar(values) {
+                const labels = ['命运','性格','依恋','习惯'];
+                const colors = ['#c084fc','#22d3ee','#f472b6','#fbbf24'];
+                const svg = document.getElementById('radar-svg');
+                const center = {x:140, y:100}, r = 70;
+                const angle = i => (Math.PI * 2 * i / 4) - Math.PI/2;
+                
+                // 网格
+                let gridHTML = '';
+                [0.25, 0.5, 0.75, 1].forEach(scale => {
+                    let points = '';
+                    for (let i=0; i<4; i++) {
+                        const a = angle(i);
+                        points += `${center.x + r*scale*Math.cos(a)},${center.y + r*scale*Math.sin(a)} `;
+                    }
+                    gridHTML += `<polygon points="${points}" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
+                });
+                // 轴线
+                for (let i=0; i<4; i++) {
+                    const a = angle(i);
+                    gridHTML += `<line x1="${center.x}" y1="${center.y}" x2="${center.x + r*Math.cos(a)}" y2="${center.y + r*Math.sin(a)}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
+                }
+                document.getElementById('radar-grid').innerHTML = gridHTML;
+                
+                // 数据多边形
+                let polyPoints = '';
+                let dotsHTML = '';
+                let labelHTML = '';
+                values.forEach((v, i) => {
+                    const a = angle(i);
+                    const dist = (v / 100) * r;
+                    const x = center.x + dist * Math.cos(a);
+                    const y = center.y + dist * Math.sin(a);
+                    polyPoints += `${x},${y} `;
+                    dotsHTML += `<circle cx="${x}" cy="${y}" r="4" class="radar-dot"/>`;
+                    // 标签
+                    const lx = center.x + (r+20) * Math.cos(a);
+                    const ly = center.y + (r+20) * Math.sin(a);
+                    labelHTML += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" fill="${colors[i]}" font-size="12" font-weight="bold">${labels[i]}</text>`;
+                });
+                document.getElementById('radar-poly').setAttribute('points', polyPoints);
+                document.getElementById('radar-points').innerHTML = dotsHTML;
+                document.getElementById('radar-labels').innerHTML = labelHTML;
+            },
+            
+            // ==================== 等待页与实时列表 ====================
+            showWaiting() {
+                document.getElementById('creator-name-display').textContent = this.state.user.name;
+                const url = `${location.origin}${location.pathname}?room=${this.state.roomId}`;
+                document.getElementById('share-url').textContent = url;
+                
+                this.showPage('page-waiting');
+                
+                // 监听joiners
+                this.db.ref(`rooms/${this.state.roomId}/joiners`).on('value', snap => {
+                    const val = snap ? snap.val() : null;
+                    this.renderFriendList(val || {});
+                });
+            },
+            renderFriendList(joiners) {
+                const list = document.getElementById('friend-list');
+                const ids = Object.keys(joiners);
+                document.getElementById('friend-count').textContent = `${ids.length} 人参与`;
+                
+                if (ids.length === 0) {
+                    list.innerHTML = `<div class="text-center text-white/20 text-sm py-8">暂无好友参与<br><span class="text-xs">把链接发给好友，TA完成测试后会自动出现在这里</span></div>`;
+                    return;
+                }
+                
+                list.innerHTML = '';
+                ids.forEach(id => {
+                    const j = joiners[id];
+                    const result = this.calcMatch(this.state.creatorData || {
+                        birthday:this.state.user.birthday, mbti:this.state.user.mbti,
+                        attachment:this.state.user.attachment, answers:this.state.answers
+                    }, j);
+                    
+                    const div = document.createElement('div');
+                    div.className = 'friend-card glass rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:bg-white/10 transition';
+                    div.innerHTML = `
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-lg font-bold">
+                            ${j.name[0]}
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-bold text-sm">${j.name}</div>
+                            <div class="text-xs text-white/40">${j.mbti} · ${this.getAttachLabel(j.attachment)}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black text-gradient">${result.total}</div>
+                            <div class="text-[10px] text-white/30">匹配指数</div>
+                        </div>
+                    `;
+                    div.onclick = () => this.showDetail(j, result);
+                    list.appendChild(div);
+                });
+            },
+            getAttachLabel(type) {
+                const map = {secure:'安全型', anxious:'焦虑型', avoidant:'回避型', fearful:'恐惧型'};
+                return map[type] || type;
+            },
+            showDetail(j, result) {
+                const c = this.state.creatorData || this.state.user;
+                const html = `
+                    <div class="text-center mb-6">
+                        <div class="flex justify-center items-center gap-3 mb-4">
+                            <div class="text-center"><div class="w-14 h-14 rounded-full glass-strong flex items-center justify-center text-2xl mx-auto mb-1">${c.name[0]}</div><div class="text-xs font-bold">${c.name}</div></div>
+                            <div class="text-2xl text-pink-400">💕</div>
+                            <div class="text-center"><div class="w-14 h-14 rounded-full glass-strong flex items-center justify-center text-2xl mx-auto mb-1">${j.name[0]}</div><div class="text-xs font-bold">${j.name}</div></div>
+                        </div>
+                        <div class="text-6xl font-black text-gradient mb-2">${result.total}</div>
+                        <div class="text-sm text-white/40">详细匹配报告</div>
+                    </div>
+                    <div class="space-y-3 mb-6">
+                        <div class="glass rounded-xl p-3 flex justify-between items-center">
+                            <span class="text-sm text-white/60">✨ 命运缘分</span>
+                            <span class="font-bold text-purple-300">${Math.round(result.destiny)}分</span>
+                        </div>
+                        <div class="glass rounded-xl p-3 flex justify-between items-center">
+                            <span class="text-sm text-white/60">🧠 性格认知 (${c.mbti} vs ${j.mbti})</span>
+                            <span class="font-bold text-cyan-300">${Math.round(result.mbti)}分</span>
+                        </div>
+                        <div class="glass rounded-xl p-3 flex justify-between items-center">
+                            <span class="text-sm text-white/60">💕 恋爱人格 (${this.getAttachLabel(c.attachment||c.attachmentScore?.type)} vs ${this.getAttachLabel(j.attachment)})</span>
+                            <span class="font-bold text-pink-300">${Math.round(result.attach)}分</span>
+                        </div>
+                        <div class="glass rounded-xl p-3 flex justify-between items-center">
+                            <span class="text-sm text-white/60">☕ 生活习惯</span>
+                            <span class="font-bold text-yellow-300">${Math.round(result.habit)}分</span>
+                        </div>
+                    </div>
+                    <div class="glass-strong rounded-xl p-4 text-sm text-white/70 leading-relaxed">
+                        ${result.total >= 80 ? '你们的组合在四个维度上均呈现高度协调。命运维度显示你们的文化脚本兼容，性格维度功能栈互补或同轴，依恋系统能够相互提供安全基地，生活习惯冲突成本极低。这是一段具有长期发展潜力的关系。' : 
+                          result.total >= 60 ? '你们在核心价值与认知层面存在共鸣，但在依恋风格或生活习惯上存在可调和的差异。建议建立"差异管理协议"：例如固定冲突修复时间、明确独处与陪伴的边界。' :
+                          '当前组合呈现高张力特征。性格或依恋维度存在结构性冲突，这不是"不合适"的判决，而是提示你们需要比常人更高的情绪粒度（Emotional Granularity）与专业支持（如伴侣咨询）来建立安全的关系容器。'}
+                    </div>
+                `;
+                document.getElementById('detail-content').innerHTML = html;
+                this.showPage('page-detail');
+            },
+            showWaiting() {
+                this.showPage('page-waiting');
+            },
+            
+            // ==================== 工具 ====================
+            copyLink() {
+                const url = document.getElementById('share-url').textContent;
+                navigator.clipboard.writeText(url).then(() => {
+                    const toast = document.getElementById('toast');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                });
+            },
+            shareToWechat() {
+                alert('请截图此页面，或点击"复制链接"后发送给微信好友');
+            }
+        };
+        
+        // 启动
+        window.app = app;
+        app.init();
+    </script>
+</body>
+</html>
